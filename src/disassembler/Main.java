@@ -26,14 +26,30 @@ public class Main {
 		
 		
 		
-	}
-	static 
-	/* codeBuffer the Buffer where the 8080 rom is loaded. 
-	 * "pc" is the program counter */
-	int Disassemble808O(int[] dat, int pc) {
+	} 
+
+	
+	/*
+	 *
+	 * 		If You're wondering what "#$" and "$" mean then read the following:
+	 * 		In most assembly languages, # is an indicator of a literal number, also called an immediate value. 
+	 * 		For example in "lea   a1, #$1000", the code will actually put a #0x1000 into register a1. 
+	 * 		If the code instead read "move.l a1, ($1000)", I would expect a1 to get the contents of memory at location 0x1000
+	 *  
+	 * 
+	 */
+	
+	
+	
+	/* 
+	 * 		In the below function:
+	 * 		"dat" is the Buffer array where the 8080 ROM is loaded. 
+	 * 		"pc" is the program counter 
+	 */
+	
+	static int Disassemble808O(int[] dat, int pc) {
 		int code = dat[pc];
 		int opbytes = 1;
-//		System.out.println("Opcode: 0x"+String.format("%x", code));
 		switch(code) {
 		case 0x00: System.out.println(String.format("%04x", pc)+"	NOP"); break;
 		case 0x01: System.out.println(String.format("%04x", pc)+"	LXI	B,#$"+String.format("%x", dat[pc+2])+""+String.format("%x", dat[pc+1])); opbytes = 3; break;

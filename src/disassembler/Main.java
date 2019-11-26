@@ -13,7 +13,7 @@ public class Main {
 		DataInputStream data = new DataInputStream(new FileInputStream(file));
 		int[] dat = new int[(int) file.length()];
 		for(int i=0;i<(int) file.length();i++) {
-			dat[i]=(int) data.read();			
+			dat[i]=(int) data.read();
 		}
 		data.close();
 		int pc = 0;
@@ -244,6 +244,22 @@ public class Main {
 		case 0xce: System.out.println(String.format("%04d", pc)+"	ACI	$"+String.format("%x",dat[pc+1])); opbytes=2; break;
 		case 0xcf: System.out.println(String.format("%04d", pc)+"	RST	1"); break;
 		case 0xd0: System.out.println(String.format("%04d", pc)+"	RNC"); break;
+		case 0xd1: System.out.println(String.format("%04d", pc)+"	POP	D"); break;
+		case 0xd2: System.out.println(String.format("%04d", pc)+"	JNC	"+String.format("%x", dat[pc+2])+String.format("%x", dat[pc+1]));opbytes=3; break;
+		case 0xd3: System.out.println(String.format("%04d", pc)+"	OUT	$"+String.format("%x",dat[pc+1])); opbytes=2; break;
+		case 0xd4: System.out.println(String.format("%04d", pc)+"	CNC	"+String.format("%x", dat[pc+2])+String.format("%x", dat[pc+1]));opbytes=3; break;
+		case 0xd5: System.out.println(String.format("%04d", pc)+"	PUSH	D"); break;
+		case 0xd6: System.out.println(String.format("%04d", pc)+"	SUI	$"+String.format("%x",dat[pc+1])); opbytes=2; break;
+		case 0xd7: System.out.println(String.format("%04d", pc)+"	RST	2"); break;
+		case 0xd8: System.out.println(String.format("%04d", pc)+"	RC"); break;
+		case 0xd9: System.out.println(String.format("%04d", pc)+"	NOP"); break;
+		case 0xda: System.out.println(String.format("%04d", pc)+"	JC	$"+String.format("%x", dat[pc+2])+String.format("%x", dat[pc+1]));opbytes=3; break;
+		case 0xdb: System.out.println(String.format("%04d", pc)+"	IN	$"+String.format("%x",dat[pc+1])); opbytes=2; break;
+		case 0xdc: System.out.println(String.format("%04d", pc)+"	CC	$"+String.format("%x", dat[pc+2])+String.format("%x", dat[pc+1]));opbytes=3; break;
+		case 0xdd: System.out.println(String.format("%04d", pc)+"	NOP"); break;
+		case 0xde: System.out.println(String.format("%04d", pc)+"	SBI	$"+String.format("%x",dat[pc+1])); opbytes=2; break;
+		case 0xdf: System.out.println(String.format("%04d", pc)+"	RST	3"); break;
+		
 		
 		}
 		return opbytes;

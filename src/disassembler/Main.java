@@ -9,15 +9,15 @@ import java.io.IOException;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		File file = new File(System.getProperty("user.dir") + "/src/disassembler/" + "invaders.h");
+		File file = new File(System.getProperty("user.dir") + "/src/Games/" + "invaders");
 		DataInputStream data = new DataInputStream(new FileInputStream(file));
-		int[] dat = new int[(int) file.length()];
-		for(int i=0;i<(int) file.length();i++) {
+		int fileSize = (int) file.length();
+		int[] dat = new int[fileSize];
+		for(int i=0;i<fileSize;i++) {
 			dat[i]=(int) data.read();
 		}
 		data.close();
 		int pc = 0;
-		int fileSize = (int) file.length();
 		while(pc < fileSize) {
 			if(dat != null) {
 				pc += Disassemble808O(dat,pc);

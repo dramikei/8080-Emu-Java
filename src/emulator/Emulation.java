@@ -53,30 +53,86 @@ public class Emulation {
 		short opcode = cpu.memory[cpu.pc];
 		System.out.println("0x"+String.format("%02x", opcode));
 		switch(opcode) {
-			case 0x00: break; //NOP
+			case 0x00: { break; } //NOP
 			
-			case 0x01: //LXI B,D16
+			case 0x01: { //LXI B,D16
 				cpu.c = cpu.memory[((cpu.pc+1) & 0xffff)];
 				cpu.b = cpu.memory[((cpu.pc+2) & 0xffff)];
 				cpu.pc = ((cpu.pc + 2) & 0xffff);
 				break;
+			}
 				
-			case 0x02: //STAX B
+			case 0x02: { //STAX B
 				int x = (cpu.b & 0xff) << 8;
 				int y = cpu.c & 0xff;
 				int addr = x | y;
 				cpu.memory[addr] = (short) (cpu.a & 0xff);
 				break;
+			}
 				
-			case 0x03: //INX B
+			case 0x03: { //INX B 
 				cpu.b = (short) ((cpu.b + 1) & 0xff);
 				cpu.c = (short) ((cpu.c + 1) & 0xff);
 				break;
+			}
 				
-			case 0x18: break; //NOP
-			default: System.out.println("UNIMPLEMENTED OPCODE: "+"0x"+String.format("%02x", opcode)); break;
+			case 0x18: { break; } //NOP
+			
+			case 0x24: { //INR H
+				short ans = (short) (cpu.h + 1);
+				cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
+				cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);
+				cpu.cc.p = Parity((short) (ans & 0xff));
+				cpu.h = (short) (ans & 0xff);
+				break;
+			}
+			
+			
+			case 0x80: { //ADD B
+				short ans = (short) (cpu.a + cpu.b);
+				cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
+				cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);
+				cpu.cc.cy = (short) ((ans > 0xff) ? 1:0);
+				cpu.cc.p = Parity((short) (ans&0xff));
+				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			
+			case 0x86: { //ADD M
+				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				short ans = (short) (cpu.a + cpu.memory[(offset)]);
+				cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
+				cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);
+				cpu.cc.cy = (short) ((ans > 0xff) ? 1:0);
+				cpu.cc.p = Parity((short) (ans&0xff));
+				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0xc3: { //JMP addr
+				cpu.pc = (int) (((cpu.memory[cpu.pc + 2] & 0xff) << 8) | (cpu.memory[cpu.pc + 1] & 0xff));
+				break;
+			}
+			
+			
+			case 0xc6: { //ADI Byte
+				short ans = (short) (cpu.a + cpu.memory[cpu.pc + 1]);
+				cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
+				cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);
+				cpu.cc.cy = (short) ((ans > 0xff) ? 1:0);
+				cpu.cc.p = Parity((short) (ans&0xff));
+				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			default: System.out.println("UNIMPLEMENTED OPCODE: "+"0x"+String.format("%02x", opcode)); System.exit(1); break;
 		}
 		cpu.pc += 1;
+	}
+	
+	short Parity(short x) {
+		return 0;
 	}
 
 }

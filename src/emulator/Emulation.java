@@ -98,6 +98,13 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x11: { //LXI D
+				cpu.e = cpu.memory[((cpu.pc+1) & 0xffff)];
+				cpu.d = cpu.memory[((cpu.pc+2) & 0xffff)];
+				cpu.pc = ((cpu.pc + 2) & 0xffff);
+				break;
+			}
+			
 			case 0x12: { //STAX D
 				int x = (cpu.d & 0xff) << 8;
 				int y = cpu.e & 0xff;
@@ -133,6 +140,13 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x21: { //LXI H
+				cpu.l = cpu.memory[((cpu.pc+1) & 0xffff)];
+				cpu.h = cpu.memory[((cpu.pc+2) & 0xffff)];
+				cpu.pc = ((cpu.pc + 2) & 0xffff);
+				break;
+			}
+			
 			case 0x23: { //INX H
 				cpu.h = (short) ((cpu.h + 1) & 0xff);
 				cpu.l = (short) ((cpu.l + 1) & 0xff);
@@ -154,6 +168,12 @@ public class Emulation {
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.l = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x31: { //LXI SP
+				cpu.sp = ((cpu.memory[((cpu.pc+2) & 0xffff)]&0xff) << 8) | (cpu.memory[((cpu.pc+1) & 0xffff)]&0xff);
+				cpu.pc = ((cpu.pc + 2) & 0xffff);
 				break;
 			}
 			

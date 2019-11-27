@@ -75,14 +75,17 @@ public class Emulation {
 				cpu.c = (short) ((cpu.c + 1) & 0xff);
 				break;
 			}
+//			case 0x06: { //MVI B,D8
+//				break;
+//			}
 				
 			case 0x18: { break; } //NOP
 			
 			case 0x24: { //INR H
 				short ans = (short) (cpu.h + 1);
-				cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
-				cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);
-				cpu.cc.p = Parity((short) (ans & 0xff));
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				cpu.h = (short) (ans & 0xff);
 				break;
 			}
@@ -90,10 +93,10 @@ public class Emulation {
 			
 			case 0x80: { //ADD B
 				short ans = (short) (cpu.a + cpu.b);
-				cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
-				cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);
-				cpu.cc.cy = (short) ((ans > 0xff) ? 1:0);
-				cpu.cc.p = Parity((short) (ans&0xff));
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
 				break;
 			}
@@ -102,36 +105,73 @@ public class Emulation {
 			case 0x86: { //ADD M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
 				short ans = (short) (cpu.a + cpu.memory[(offset)]);
-				cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
-				cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);
-				cpu.cc.cy = (short) ((ans > 0xff) ? 1:0);
-				cpu.cc.p = Parity((short) (ans&0xff));
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0xc2: { //JNZ addr
+				if (cpu.cc.z == 0) {
+					jump_to_addr(cpu);
+				} else {
+					cpu.pc = (cpu.pc + 2)&0xffff;
+				}
 				break;
 			}
 			
 			case 0xc3: { //JMP addr
-				cpu.pc = (int) (((cpu.memory[cpu.pc + 2] & 0xff) << 8) | (cpu.memory[cpu.pc + 1] & 0xff));
+				jump_to_addr(cpu);
 				break;
 			}
 			
 			
+			
 			case 0xc6: { //ADI Byte
-				short ans = (short) (cpu.a + cpu.memory[cpu.pc + 1]);
-				cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
-				cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);
-				cpu.cc.cy = (short) ((ans > 0xff) ? 1:0);
-				cpu.cc.p = Parity((short) (ans&0xff));
+				short ans = (short) (cpu.a + cpu.memory[(cpu.pc + 1) & 0xffff]);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0xcd: { //CALL addr
+				int ret = (cpu.pc +2)&0xffff;
+				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
+				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
+				cpu.sp = (cpu.sp-2)&0xffff;
+				jump_to_addr(cpu);
 				break;
 			}
 			
 			default: System.out.println("UNIMPLEMENTED OPCODE: "+"0x"+String.format("%02x", opcode)); System.exit(1); break;
 		}
-		cpu.pc += 1;
+		cpu.pc = (cpu.pc+1)&0xffff;
+	}
+	
+	void set_cc_zero(short ans, CPU cpu ) {
+		cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
+	}
+	void set_cc_sign(short ans, CPU cpu) {
+		cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);
+	}
+	void set_cc_carry(short ans, CPU cpu) {
+		cpu.cc.cy = (short) ((ans > 0xff) ? 1:0);
+	}
+	void set_cc_parity(short ans, CPU cpu) {
+		cpu.cc.p = Parity((short) (ans&0xff));
+	}
+	
+	void jump_to_addr(CPU cpu) {
+		cpu.pc = (int) (((cpu.memory[(cpu.pc + 2) & 0xffff] & 0xff) << 8) | (cpu.memory[(cpu.pc + 1) & 0xffff] & 0xff));
 	}
 	
 	short Parity(short x) {
+		//PLACEHOLDER TODO: Complete function.
 		return 0;
 	}
 

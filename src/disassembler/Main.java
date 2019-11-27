@@ -50,6 +50,7 @@ public class Main {
 	static int Disassemble808O(int[] dat, int pc) {
 		int code = dat[pc];
 		int opbytes = 1;
+		System.out.println("OPCODE: 0x"+String.format("%02x", code));
 		switch(code) {
 		case 0x00: System.out.println(String.format("%04x", pc)+"	NOP"); break;
 		case 0x01: System.out.println(String.format("%04x", pc)+"	LXI	B,#$"+String.format("%x", dat[pc+2])+""+String.format("%x", dat[pc+1])); opbytes = 3; break;

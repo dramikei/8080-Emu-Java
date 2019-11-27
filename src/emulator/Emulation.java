@@ -26,7 +26,7 @@ public class Emulation {
 	 *  short is 16 bits (Signed)
 	 *  int is 32 bits (Signed)
 	 *  
-	 *  0xff(Hex) -> 255(Deciman) -> 11111111 (Binary) => 8 bits (1 Byte)
+	 *  0xff(Hex) -> 255(Decimal) -> 11111111 (Binary) => 8 bits (1 Byte)
 	 *  0xffff(Hex) -> 65535 (Decimal) -> 1111111111111111 (Binary) => 16 bits (2 Bytes)
 	 *  
 	 *  Google if you don't know about signed and unsigned data types.
@@ -212,10 +212,69 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x81: { //ADD C
+				short ans = (short) (cpu.a + cpu.c);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x82: { //ADD D
+				short ans = (short) (cpu.a + cpu.d);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x83: { //ADD E
+				short ans = (short) (cpu.a + cpu.e);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x84: { //ADD H
+				short ans = (short) (cpu.a + cpu.h);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x85: { //ADD L
+				short ans = (short) (cpu.a + cpu.l);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+				break;
+			}
 			
 			case 0x86: { //ADD M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
 				short ans = (short) (cpu.a + cpu.memory[(offset)]);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x87: { //ADD A
+				short ans = (short) (cpu.a + cpu.a);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);

@@ -98,6 +98,12 @@ public class Emulation {
 //				break;
 //			}
 			
+			case 0x0b: { //DCX B
+				cpu.b = (short) ((cpu.b - 1) & 0xff);
+				cpu.c = (short) ((cpu.c - 1) & 0xff);
+				break;
+			}
+			
 			case 0x0c: { //INR C
 				short ans = (short) (cpu.c + 1);
 				set_cc_zero(ans,cpu);
@@ -156,6 +162,12 @@ public class Emulation {
 				
 			case 0x18: { break; } //NOP
 			
+			case 0x1b: { //DCX D
+				cpu.d = (short) ((cpu.b - 1) & 0xff);
+				cpu.e = (short) ((cpu.c - 1) & 0xff);
+				break;
+			}
+			
 			
 			case 0x1c: { //INR E
 				short ans = (short) (cpu.e + 1);
@@ -205,6 +217,22 @@ public class Emulation {
 				cpu.h = (short) (ans & 0xff);
 				break;
 			}
+
+//
+///////////// IGNORED as it depends on Auxiliary Carry which is NOT implemented. ////////////////////
+//			case 0x27: { //DAA 
+//
+//				short lsn = (short) (cpu.a&0xf); // Least significant Nibble
+//				short msn = (short) ((cpu.a >> 4)&0xf); // Most significant Nibble
+//				
+//				break;
+//			}
+			
+			case 0x2b: { //DCX H
+				cpu.h = (short) ((cpu.b - 1) & 0xff);
+				cpu.l = (short) ((cpu.c - 1) & 0xff);
+				break;
+			}
 			
 			case 0x2c: { //INR L
 				short ans = (short) (cpu.l + 1);
@@ -221,6 +249,11 @@ public class Emulation {
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.l = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x2f: { //CMA
+				cpu.a = (short) ((~cpu.a)&0xff);
 				break;
 			}
 			
@@ -260,6 +293,11 @@ public class Emulation {
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x3b: { //DCX SP
+				cpu.sp = (short) ((cpu.sp - 1) & 0xffff);
 				break;
 			}
 			

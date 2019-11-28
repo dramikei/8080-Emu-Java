@@ -85,12 +85,30 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x05: { //DCR B
+				short ans = (short) (cpu.b -1);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.b = (short) (ans & 0xff);
+				break;
+			}
+			
 //			case 0x06: { //MVI B,D8
 //				break;
 //			}
 			
 			case 0x0c: { //INR C
 				short ans = (short) (cpu.c + 1);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.c = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x0d: { //DCR C
+				short ans = (short) (cpu.c -1);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
@@ -126,13 +144,30 @@ public class Emulation {
 				set_cc_parity(ans,cpu);
 				cpu.d = (short) (ans & 0xff);
 				break;
-			}	
+			}
+			case 0x15: { //DCR D
+				short ans = (short) (cpu.d -1);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.d = (short) (ans & 0xff);
+				break;
+			}
 				
 			case 0x18: { break; } //NOP
 			
 			
 			case 0x1c: { //INR E
 				short ans = (short) (cpu.e + 1);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.e = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x1d: { //DCR E
+				short ans = (short) (cpu.e -1);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
@@ -162,8 +197,26 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x25: { //DCR H
+				short ans = (short) (cpu.h -1);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.h = (short) (ans & 0xff);
+				break;
+			}
+			
 			case 0x2c: { //INR L
 				short ans = (short) (cpu.l + 1);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.l = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x2d: { //DCR L
+				short ans = (short) (cpu.l -1);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
@@ -192,8 +245,26 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x35: { //DCR M
+				short ans = (short) (cpu.memory[(((cpu.h&0xff)<<8)|(cpu.l&0xff))&0xffff]-1);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.memory[(((cpu.h&0xff)<<8)|(cpu.l&0xff))&0xffff] = (short) (ans & 0xff);
+				break;
+			}
+			
 			case 0x3c: { //INR A
 				short ans = (short) (cpu.a + 1);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x3d: { //DCR A
+				short ans = (short) (cpu.a -1);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);

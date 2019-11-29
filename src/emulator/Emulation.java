@@ -490,6 +490,7 @@ public class Emulation {
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				cpu.pc = (short) ((cpu.pc + 1)&0xffff);
 				break;
 			}
 			
@@ -500,6 +501,18 @@ public class Emulation {
 			
 			case 0xcd: { //CALL addr
 				call(cpu);
+				break;
+			}
+			
+			case 0xce: { //ACI D8
+				short data = (short)cpu.memory[(cpu.pc+1)&0xffff];
+				short ans = (short) (cpu.a + data + cpu.cc.cy);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+				cpu.pc = (short) ((cpu.pc + 1)&0xffff);
 				break;
 			}
 			

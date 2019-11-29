@@ -392,6 +392,81 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x88: { //ADC B
+				short ans = (short) (cpu.a + cpu.b + cpu.cc.cy);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+			}
+			
+			case 0x89: { //ADC C
+				short ans = (short) (cpu.a + cpu.c + cpu.cc.cy);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+			}
+			
+			
+			case 0x8a: { //ADC D
+				short ans = (short) (cpu.a + cpu.d + cpu.cc.cy);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+			}
+			
+			
+			case 0x8b: { //ADC E
+				short ans = (short) (cpu.a + cpu.e + cpu.cc.cy);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+			}
+			
+			case 0x8c: { //ADC h
+				short ans = (short) (cpu.a + cpu.h + cpu.cc.cy);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+			}
+			
+			case 0x8d: { //ADC L
+				short ans = (short) (cpu.a + cpu.l + cpu.cc.cy);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+			}
+			
+			case 0x8e: { //ADC M
+				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				short ans = (short) (cpu.a + cpu.memory[(offset)] + cpu.cc.cy);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+			}
+			
+			case 0x8f: { //ADC A
+				short ans = (short) (cpu.a + cpu.a + cpu.cc.cy);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short) (ans & 0xff);
+			}
+			
 			case 0xc2: { //JNZ addr
 				if (cpu.cc.z == 0) {
 					jump_to_addr(cpu);

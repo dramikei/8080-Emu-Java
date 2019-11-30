@@ -532,7 +532,16 @@ public class Emulation {
 		cpu.cc.cy = (short) ((ans > 0xff) ? 1:0);
 	}
 	void set_cc_parity(short ans, CPU cpu) {
-		cpu.cc.p = Parity((short) (ans&0xff));
+		String byt = Integer.toBinaryString(ans&0xff);
+		int count = 0;
+		for(int i = 0; i<byt.length(); i++) {
+		    char c = byt.charAt(i);
+		    if (c == '1') {
+		        count +=1;
+		    }
+		}
+		
+		cpu.cc.p = (short) ((count % 2) == 0 ? 1 : 0);
 	}
 	
 	void jump_to_addr(CPU cpu) {
@@ -550,11 +559,6 @@ public class Emulation {
 		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;
 		jump_to_addr(cpu);
-	}
-	
-	short Parity(short x) {
-		//PLACEHOLDER TODO: Complete function.
-		return 0;
 	}
 
 }

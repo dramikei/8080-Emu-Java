@@ -104,6 +104,8 @@ public class Emulation {
 				int BC = ((cpu.b << 8) | (cpu.c))&0xffff;
 				int HL = ((cpu.h << 8) | (cpu.l))&0xffff;
 				int ans = HL + BC;
+				cpu.h = (short)((ans >> 8)&0xff);
+				cpu.l = (short) (ans&0xff);
 				set_cc_carry_pair(ans,cpu);
 				break;
 			}
@@ -132,6 +134,12 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x0e: { //MVI C,D8
+				cpu.c = cpu.memory[((cpu.pc+1) & 0xffff)];
+				cpu.pc = ((cpu.pc + 1) & 0xffff);
+				break;
+			}
+			
 			case 0x0f: { //RRC
 				short ans = cpu.a;
 				cpu.a = (short) (((ans&1) << 7) | (ans >> 1));
@@ -139,7 +147,7 @@ public class Emulation {
 				break;
 			}
 			
-			case 0x11: { //LXI D
+			case 0x11: { //LXI D, D16
 				cpu.e = cpu.memory[((cpu.pc+1) & 0xffff)];
 				cpu.d = cpu.memory[((cpu.pc+2) & 0xffff)];
 				cpu.pc = ((cpu.pc + 2) & 0xffff);
@@ -178,6 +186,21 @@ public class Emulation {
 			}
 				
 			case 0x18: { break; } //NOP
+			
+			case 0x19: { //DAD D
+				int DE = ((cpu.d << 8) | (cpu.e))&0xffff;
+				int HL = ((cpu.h << 8) | (cpu.l))&0xffff;
+				int ans = HL + DE;
+				cpu.h = (short)((ans >> 8)&0xff);
+				cpu.l = (short) (ans&0xff);
+				set_cc_carry_pair(ans,cpu);
+				break;
+			}
+			
+			case 0x1a: { //LDAX D
+				cpu.a = cpu.memory[((cpu.d << 8) | (cpu.e))&0xffff];
+				break;
+			}
 			
 			case 0x1b: { //DCX D
 				cpu.d = (short) ((cpu.b - 1) & 0xff);

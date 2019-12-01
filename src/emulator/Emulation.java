@@ -622,6 +622,7 @@ public class Emulation {
 	
 	void jump_to_addr(CPU cpu) {
 		cpu.pc = (int) (((cpu.memory[(cpu.pc + 2) & 0xffff] & 0xff) << 8) | (cpu.memory[(cpu.pc + 1) & 0xffff] & 0xff));
+		cpu.pc = (cpu.pc-1)&0xffff; //as pc gets incremented by 1 in the emulation block
 	}
 	
 	void ret(CPU cpu) {
@@ -631,6 +632,7 @@ public class Emulation {
 	
 	void call(CPU cpu) {
 		int ret = (cpu.pc +2)&0xffff;
+//		System.out.println(String.format("%x", (cpu.sp)));
 		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
 		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;

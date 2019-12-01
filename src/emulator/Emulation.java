@@ -163,8 +163,9 @@ public class Emulation {
 			}
 			
 			case 0x13: { //INX D
-				cpu.d = (short) ((cpu.d + 1) & 0xff);
-				cpu.e = (short) ((cpu.e + 1) & 0xff);
+				int DE = (((cpu.d << 8) | (cpu.e))&0xffff) + 1;
+				cpu.d = (short) ((DE>>8) & 0xff);
+				cpu.e = (short) ((DE) & 0xff);
 				break;
 			}
 			
@@ -369,6 +370,12 @@ public class Emulation {
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x77: { //MOV M,A
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.memory[addr] = cpu.a;
 				break;
 			}
 			
@@ -588,8 +595,6 @@ public class Emulation {
 				cpu.pc = (cpu.pc + 1)&0xffff;
 				break;
 			}
-			
-			
 			default: System.out.println("UNIMPLEMENTED OPCODE: "+"0x"+String.format("%02x", opcode)); System.exit(1); break;
 		}
 		cpu.pc = (cpu.pc+1)&0xffff;

@@ -6,7 +6,7 @@ public class Main {
 		CPU cpu = new CPU();
 		Emulation emulator = new Emulation();
 		emulator.loadGame(cpu, "invaders");
-		for(int i =0;i<50;i++) {
+		for(int i =0;i<100000;i++) {
 			// Loop is a placeholder, will be removed in future version.
 			emulator.Emulate8080(cpu);
 		}

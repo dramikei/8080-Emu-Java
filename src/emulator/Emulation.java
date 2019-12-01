@@ -274,6 +274,15 @@ public class Emulation {
 //				break;
 //			}
 			
+			case 0x29: { //DAD H
+				int HL = ((cpu.h << 8) | (cpu.l))&0xffff;
+				int ans = HL <<1;
+				cpu.h = (short)((ans >> 8)&0xff);
+				cpu.l = (short) (ans&0xff);
+				set_cc_carry_pair(ans,cpu);
+				break;
+			}
+			
 			case 0x2b: { //DCX H
 				cpu.h = (short) ((cpu.b - 1) & 0xff);
 				cpu.l = (short) ((cpu.c - 1) & 0xff);
@@ -306,6 +315,13 @@ public class Emulation {
 			case 0x31: { //LXI SP
 				cpu.sp = ((cpu.memory[((cpu.pc+2) & 0xffff)]&0xff) << 8) | (cpu.memory[((cpu.pc+1) & 0xffff)]&0xff);
 				cpu.pc = ((cpu.pc + 2) & 0xffff);
+				break;
+			}
+			
+			case 0x32: { //STA addr
+				int addr = ((cpu.memory[cpu.pc+2]&0xff) | (cpu.memory[cpu.pc+1])&0xff)&0xffff;
+				cpu.memory[addr] = cpu.a;
+				cpu.pc = (cpu.pc+2)&0xffff;
 				break;
 			}
 			

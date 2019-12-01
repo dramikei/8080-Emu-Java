@@ -94,9 +94,19 @@ public class Emulation {
 				break;
 			}
 			
-//			case 0x06: { //MVI B,D8
-//				break;
-//			}
+			case 0x06: { //MVI B,D8
+				cpu.b = cpu.memory[((cpu.pc+1) & 0xffff)];
+				cpu.pc = ((cpu.pc + 1) & 0xffff);
+				break;
+			}
+			
+			case 0x09: { //DAD B
+				int BC = ((cpu.b << 8) | (cpu.c))&0xffff;
+				int HL = ((cpu.h << 8) | (cpu.l))&0xffff;
+				int ans = HL + BC;
+				set_cc_carry_pair(ans,cpu);
+				break;
+			}
 			
 			case 0x0b: { //DCX B
 				cpu.b = (short) ((cpu.b - 1) & 0xff);
@@ -119,6 +129,13 @@ public class Emulation {
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.c = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x0f: { //RRC
+				short ans = cpu.a;
+				cpu.a = (short) (((ans&1) << 7) | (ans >> 1));
+				cpu.cc.cy = (short) (((ans & 1) == 1) ? 1 : 0);
 				break;
 			}
 			
@@ -184,6 +201,12 @@ public class Emulation {
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.e = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x1f: { //RAR
+				short ans = cpu.a;
+				cpu.a = (short)(((cpu.cc.cy << 7) | (ans >> 1))&0xff);
 				break;
 			}
 			
@@ -516,6 +539,17 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xe6: { //ANI Byte
+				short ans = (short) ((cpu.a &0xff)& cpu.memory[(cpu.pc+1)&0xffff]);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.cc.cy = 0;
+				cpu.a = ans;
+				cpu.pc = (cpu.pc + 1)&0xffff;
+				break;
+			}
+			
 			
 			default: System.out.println("UNIMPLEMENTED OPCODE: "+"0x"+String.format("%02x", opcode)); System.exit(1); break;
 		}
@@ -530,6 +564,9 @@ public class Emulation {
 	}
 	void set_cc_carry(short ans, CPU cpu) {
 		cpu.cc.cy = (short) ((ans > 0xff) ? 1:0);
+	}
+	void set_cc_carry_pair(int ans, CPU cpu) {
+		cpu.cc.cy = (short) ((ans > 0xffff) ? 1:0);
 	}
 	void set_cc_parity(short ans, CPU cpu) {
 		String byt = Integer.toBinaryString(ans&0xff);

@@ -363,6 +363,18 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x36: { //MVI M,D8
+				int mem = ((cpu.h&0xff) << 8) | (cpu.l&0xff);
+				cpu.memory[mem] = cpu.memory[(cpu.pc+1)&0xffff];
+				cpu.pc = ((cpu.pc + 1) & 0xffff);
+				break;
+			}
+			
+			case 0x37: { //STC
+				cpu.cc.cy = 1;
+				break;
+			}
+			
 			
 			case 0x39: { //DAD SP
 				int HL = ((cpu.h << 8) | (cpu.l))&0xffff;
@@ -393,6 +405,11 @@ public class Emulation {
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+			
+			case 0x3f: { //CMC
+				cpu.cc.cy = (short) (cpu.cc.cy == 0 ? 1:0);
 				break;
 			}
 			

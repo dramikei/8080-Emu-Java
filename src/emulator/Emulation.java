@@ -264,6 +264,13 @@ public class Emulation {
 				cpu.h = (short) (ans & 0xff);
 				break;
 			}
+			
+			
+			case 0x26: { //MVI H,D8
+				cpu.h = cpu.memory[((cpu.pc+1) & 0xffff)];
+				cpu.pc = ((cpu.pc + 1) & 0xffff);
+				break;
+			}
 
 //
 ///////////// IGNORED as it depends on Auxiliary Carry which is NOT implemented. ////////////////////
@@ -308,6 +315,12 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x2e: { //MVI L,D8
+				cpu.l = cpu.memory[((cpu.pc+1) & 0xffff)];
+				cpu.pc = ((cpu.pc + 1) & 0xffff);
+				break;
+			}
+			
 			case 0x2f: { //CMA
 				cpu.a = (short) ((~cpu.a)&0xff);
 				break;
@@ -347,6 +360,16 @@ public class Emulation {
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.memory[(((cpu.h&0xff)<<8)|(cpu.l&0xff))&0xffff] = (short) (ans & 0xff);
+				break;
+			}
+			
+			
+			case 0x39: { //DAD SP
+				int HL = ((cpu.h << 8) | (cpu.l))&0xffff;
+				int ans = HL + cpu.sp;
+				cpu.h = (short)((ans >> 8)&0xff);
+				cpu.l = (short) (ans&0xff);
+				set_cc_carry_pair(ans,cpu);
 				break;
 			}
 			

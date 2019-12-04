@@ -413,6 +413,24 @@ public class Emulation {
 				break;
 			}
 
+			case 0x56: { //MOV D,M
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.d = cpu.memory[addr];
+				break;
+			}
+
+			case 0x5e: { //MOV E,M
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.d = cpu.memory[addr];
+				break;
+			}
+
+			case 0x66: { //MOV H,M
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.h = cpu.memory[addr];
+				break;
+			}
+
 			case 0x6f: { //MOV L,A
 				cpu.l = cpu.a;
 				break;
@@ -437,8 +455,8 @@ public class Emulation {
 				break;
 			}
 			case 0x7e: { //MOV A,M
-				int mem = ((cpu.h&0xff) << 8) | (cpu.l&0xff);
-				cpu.a = cpu.memory[mem&0xffff];
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.a = cpu.memory[addr];
 				break;
 			}
 			

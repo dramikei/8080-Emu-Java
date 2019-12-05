@@ -727,6 +727,56 @@ public class Emulation {
 				break;
 			}
 
+			case 0xb0: { //ORA B
+				cpu.a = (cpu.a|cpu.b)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xb1: { //ORA C
+				cpu.a = (cpu.a|cpu.c)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+
+			case 0xb2: { //ORA D
+				cpu.a = (cpu.a|cpu.d)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xb3: { //ORA E
+				cpu.a = (cpu.a|cpu.e)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xb4: { //ORA H
+				cpu.a = (cpu.a|cpu.h)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xb5: { //ORA L
+				cpu.a = (cpu.a|cpu.l)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xb6: { //ORA M
+				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.a = (cpu.a|cpu.memory[offset&0xffff])&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xb7: { //ORA A
+				cpu.a = (cpu.a|cpu.a)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
 			case 0xc2: { //JNZ addr
 				if (cpu.cc.z == 0) {
 					jump_to_addr(cpu);

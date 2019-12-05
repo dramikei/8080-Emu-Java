@@ -677,7 +677,56 @@ public class Emulation {
 				cpu.cc.cy = 0;
 				break;
 			}
+
+			case 0xa8: { //XRA B
+				cpu.a = (cpu.a^cpu.b)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
 			
+			case 0xa9: { //XRA C
+				cpu.a = (cpu.a^cpu.c)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xaa: { //XRA D
+				cpu.a = (cpu.a^cpu.d)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xab: { //XRA E
+				cpu.a = (cpu.a^cpu.e)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xac: { //XRA H
+				cpu.a = (cpu.a^cpu.h)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xad: { //XRA L
+				cpu.a = (cpu.a^cpu.l)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xae: { //XRA M
+				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.a = (cpu.a^cpu.memory[offset&0xffff])&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
+			case 0xaf: { //XRA A
+				cpu.a = (cpu.a^cpu.a)&0xff;
+				cpu.cc.cy = 0;
+				break;
+			}
+
 			case 0xc2: { //JNZ addr
 				if (cpu.cc.z == 0) {
 					jump_to_addr(cpu);

@@ -631,42 +631,50 @@ public class Emulation {
 
 			case 0xa0: { //ANA B
 				cpu.a = (cpu.a&cpu.b)&0xff;
+				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa1: { //ANA C
 				cpu.a = (cpu.a&cpu.c)&0xff;
+				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa2: { //ANA D
 				cpu.a = (cpu.a&cpu.d)&0xff;
+				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa3: { //ANA E
 				cpu.a = (cpu.a&cpu.e)&0xff;
+				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa4: { //ANA H
 				cpu.a = (cpu.a&cpu.h)&0xff;
+				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa5: { //ANA L
 				cpu.a = (cpu.a&cpu.l)&0xff;
+				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa6: { //ANA M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
 				cpu.a = (cpu.a&cpu.memory[offset&0xffff])&0xff;
+				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa7: { //ANA A
 				cpu.a = (cpu.a&cpu.a)&0xff;
+				cpu.cc.cy = 0;
 				break;
 			}
 			
@@ -771,7 +779,6 @@ public class Emulation {
 	
 	void call(CPU cpu) {
 		int ret = (cpu.pc +2)&0xffff;
-//		System.out.println(String.format("%x", (cpu.sp)));
 		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
 		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;

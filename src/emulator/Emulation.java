@@ -333,7 +333,7 @@ public class Emulation {
 			}
 			
 			case 0x32: { //STA addr
-				int addr = ((cpu.memory[cpu.pc+2]&0xff) | (cpu.memory[cpu.pc+1])&0xff)&0xffff;
+				int addr = (((cpu.memory[cpu.pc+2]&0xff)<<8) | (cpu.memory[cpu.pc+1])&0xff)&0xffff;
 				cpu.memory[addr] = cpu.a;
 				cpu.pc = (cpu.pc+2)&0xffff;
 				break;
@@ -384,6 +384,18 @@ public class Emulation {
 				set_cc_carry_pair(ans,cpu);
 				break;
 			}
+
+			case 0x3a: { //LDA addr
+				int addr = (((cpu.memory[cpu.pc+2]&0xff)<<8) | (cpu.memory[cpu.pc+1])&0xff)&0xffff;
+				cpu.a = cpu.memory[addr];
+				cpu.pc = (cpu.pc + 2)&0xffff;
+				break;
+			}
+
+			case 0x3b: { //DCX SP
+				cpu.sp = (short) ((cpu.sp - 1) & 0xffff);
+				break;
+			}
 			
 			case 0x3c: { //INR A
 				short ans = (short) (cpu.a + 1);
@@ -394,17 +406,17 @@ public class Emulation {
 				break;
 			}
 			
-			case 0x3b: { //DCX SP
-				cpu.sp = (short) ((cpu.sp - 1) & 0xffff);
-				break;
-			}
-			
 			case 0x3d: { //DCR A
 				short ans = (short) (cpu.a -1);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
+			}
+
+			case 0x3e: { //MVI A,D8
+				cpu.a = cpu.memory[cpu.pc + 1]&0xff;
 				break;
 			}
 			
@@ -615,6 +627,47 @@ public class Emulation {
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+			}
+
+			case 0xa0: { //ANA B
+				cpu.a = (cpu.a&cpu.b)&0xff;
+				break;
+			}
+
+			case 0xa1: { //ANA C
+				cpu.a = (cpu.a&cpu.c)&0xff;
+				break;
+			}
+
+			case 0xa2: { //ANA D
+				cpu.a = (cpu.a&cpu.d)&0xff;
+				break;
+			}
+
+			case 0xa3: { //ANA E
+				cpu.a = (cpu.a&cpu.e)&0xff;
+				break;
+			}
+
+			case 0xa4: { //ANA H
+				cpu.a = (cpu.a&cpu.h)&0xff;
+				break;
+			}
+
+			case 0xa5: { //ANA L
+				cpu.a = (cpu.a&cpu.l)&0xff;
+				break;
+			}
+
+			case 0xa6: { //ANA M
+				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.a = (cpu.a&cpu.memory[offset&0xffff])&0xff;
+				break;
+			}
+
+			case 0xa7: { //ANA A
+				cpu.a = (cpu.a&cpu.a)&0xff;
+				break;
 			}
 			
 			case 0xc2: { //JNZ addr

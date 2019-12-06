@@ -776,6 +776,13 @@ public class Emulation {
 				cpu.cc.cy = 0;
 				break;
 			}
+			
+			case 0xc1: { //POP B
+				cpu.c = cpu.memory[cpu.sp];
+				cpu.b = cpu.memory[(cpu.sp+1)&0xffff];
+				cpu.sp = (cpu.sp + 2)&0xffff;
+				break;
+			}
 
 			case 0xc2: { //JNZ addr
 				if (cpu.cc.z == 0) {
@@ -791,7 +798,12 @@ public class Emulation {
 				break;
 			}
 			
-			
+			case 0xc5: { //PUSH B
+				cpu.memory[(cpu.sp-1)&0xffff] = (short) (cpu.b&0xff);
+				cpu.memory[(cpu.sp-2)&0xffff] = (short) (cpu.c&0xff);
+				cpu.sp = (cpu.sp-2)&0xffff;
+				break;
+			}
 			
 			case 0xc6: { //ADI Byte
 				short ans = (short) (cpu.a + cpu.memory[(cpu.pc + 1) & 0xffff]);
@@ -823,6 +835,20 @@ public class Emulation {
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
 				cpu.pc = (short) ((cpu.pc + 1)&0xffff);
+				break;
+			}
+			
+			case 0xd5: { //PUSH D
+				cpu.memory[(cpu.sp-1)&0xffff] = (short) (cpu.d&0xff);
+				cpu.memory[(cpu.sp-2)&0xffff] = (short) (cpu.e&0xff);
+				cpu.sp = (cpu.sp-2)&0xffff;
+				break;
+			}
+			
+			case 0xe5: { //PUSH H
+				cpu.memory[(cpu.sp-1)&0xffff] = (short) (cpu.h&0xff);
+				cpu.memory[(cpu.sp-2)&0xffff] = (short) (cpu.l&0xff);
+				cpu.sp = (cpu.sp-2)&0xffff;
 				break;
 			}
 			

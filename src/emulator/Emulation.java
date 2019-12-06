@@ -416,7 +416,7 @@ public class Emulation {
 			}
 
 			case 0x3e: { //MVI A,D8
-				cpu.a = cpu.memory[cpu.pc + 1]&0xff;
+				cpu.a = (short) (cpu.memory[cpu.pc + 1]&0xff);
 				break;
 			}
 			
@@ -630,149 +630,149 @@ public class Emulation {
 			}
 
 			case 0xa0: { //ANA B
-				cpu.a = (cpu.a&cpu.b)&0xff;
+				cpu.a = (short) ((cpu.a&cpu.b)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa1: { //ANA C
-				cpu.a = (cpu.a&cpu.c)&0xff;
+				cpu.a = (short) ((cpu.a&cpu.c)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa2: { //ANA D
-				cpu.a = (cpu.a&cpu.d)&0xff;
+				cpu.a = (short) ((cpu.a&cpu.d)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa3: { //ANA E
-				cpu.a = (cpu.a&cpu.e)&0xff;
+				cpu.a = (short) ((cpu.a&cpu.e)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa4: { //ANA H
-				cpu.a = (cpu.a&cpu.h)&0xff;
+				cpu.a = (short) ((cpu.a&cpu.h)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa5: { //ANA L
-				cpu.a = (cpu.a&cpu.l)&0xff;
+				cpu.a = (short) ((cpu.a&cpu.l)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa6: { //ANA M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
-				cpu.a = (cpu.a&cpu.memory[offset&0xffff])&0xff;
+				cpu.a = (short) ((cpu.a&cpu.memory[offset&0xffff])&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa7: { //ANA A
-				cpu.a = (cpu.a&cpu.a)&0xff;
+				cpu.a = (short) ((cpu.a&cpu.a)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xa8: { //XRA B
-				cpu.a = (cpu.a^cpu.b)&0xff;
+				cpu.a = (short) ((cpu.a^cpu.b)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 			
 			case 0xa9: { //XRA C
-				cpu.a = (cpu.a^cpu.c)&0xff;
+				cpu.a = (short) ((cpu.a^cpu.c)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xaa: { //XRA D
-				cpu.a = (cpu.a^cpu.d)&0xff;
+				cpu.a = (short) ((cpu.a^cpu.d)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xab: { //XRA E
-				cpu.a = (cpu.a^cpu.e)&0xff;
+				cpu.a = (short) ((cpu.a^cpu.e)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xac: { //XRA H
-				cpu.a = (cpu.a^cpu.h)&0xff;
+				cpu.a = (short) ((cpu.a^cpu.h)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xad: { //XRA L
-				cpu.a = (cpu.a^cpu.l)&0xff;
+				cpu.a = (short) ((cpu.a^cpu.l)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xae: { //XRA M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
-				cpu.a = (cpu.a^cpu.memory[offset&0xffff])&0xff;
+				cpu.a = (short) ((cpu.a^cpu.memory[offset&0xffff])&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xaf: { //XRA A
-				cpu.a = (cpu.a^cpu.a)&0xff;
+				cpu.a = (short) ((cpu.a^cpu.a)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xb0: { //ORA B
-				cpu.a = (cpu.a|cpu.b)&0xff;
+				cpu.a = (short) ((cpu.a|cpu.b)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xb1: { //ORA C
-				cpu.a = (cpu.a|cpu.c)&0xff;
+				cpu.a = (short) ((cpu.a|cpu.c)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 
 			case 0xb2: { //ORA D
-				cpu.a = (cpu.a|cpu.d)&0xff;
+				cpu.a = (short) ((cpu.a|cpu.d)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xb3: { //ORA E
-				cpu.a = (cpu.a|cpu.e)&0xff;
+				cpu.a = (short) ((cpu.a|cpu.e)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xb4: { //ORA H
-				cpu.a = (cpu.a|cpu.h)&0xff;
+				cpu.a = (short) ((cpu.a|cpu.h)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xb5: { //ORA L
-				cpu.a = (cpu.a|cpu.l)&0xff;
+				cpu.a = (short) ((cpu.a|cpu.l)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xb6: { //ORA M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
-				cpu.a = (cpu.a|cpu.memory[offset&0xffff])&0xff;
+				cpu.a = (short) ((cpu.a|cpu.memory[offset&0xffff])&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}
 
 			case 0xb7: { //ORA A
-				cpu.a = (cpu.a|cpu.a)&0xff;
+				cpu.a = (short) ((cpu.a|cpu.a)&0xff);
 				cpu.cc.cy = 0;
 				break;
 			}

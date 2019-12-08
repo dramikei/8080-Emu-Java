@@ -894,6 +894,18 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xf5: { //PUSH PSW
+				cpu.memory[cpu.sp-1] = cpu.a;
+				short psw = (short) ((cpu.cc.z | 
+						cpu.cc.s << 1 | 
+						cpu.cc.p << 2 | 
+						cpu.cc.cy << 3 | 
+						cpu.cc.ac << 4)&0xff);
+				cpu.memory[cpu.sp-2] = psw;
+				cpu.sp = (cpu.sp - 2)&0xffff;
+				break;
+			}
+			
 			
 			default: System.out.println("UNIMPLEMENTED OPCODE: "+"0x"+String.format("%02x", opcode)); System.exit(1); break;
 		}

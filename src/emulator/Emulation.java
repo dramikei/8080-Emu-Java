@@ -51,7 +51,8 @@ public class Emulation {
 	
 	void Emulate8080(CPU cpu) {
 		short opcode = cpu.memory[cpu.pc];
-		System.out.println("0x"+String.format("%02x", opcode));
+		System.out.println(String.format("%02x", cpu.pc)+":	0x"+String.format("%02x", opcode));
+		System.out.println("");
 		switch(opcode) {
 			case 0x00: { break; } //NOP
 			
@@ -790,10 +791,8 @@ public class Emulation {
 			}
 
 			case 0xc2: { //JNZ addr
-				if (cpu.cc.z == 0) {
+				if (cpu.cc.z == 1) {
 					jump_to_addr(cpu);
-				} else {
-					cpu.pc = (cpu.pc + 2)&0xffff;
 				}
 				break;
 			}

@@ -11,7 +11,7 @@ public class CPU {
 	int sp;
 	int pc;
 	short[] memory;
-	short int_enable;
+	boolean interrupt_enable;
 	ConditionCode cc;
 	
 	public CPU() {

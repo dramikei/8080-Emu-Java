@@ -826,6 +826,13 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xca: { //JZ addr
+				if (cpu.cc.z == 1) {
+					jump_to_addr(cpu);
+				}
+				break;
+			}
+			
 			case 0xcd: { //CALL addr
 				call(cpu);
 				break;
@@ -854,6 +861,11 @@ public class Emulation {
 				cpu.memory[(cpu.sp-1)&0xffff] = (short) (cpu.d&0xff);
 				cpu.memory[(cpu.sp-2)&0xffff] = (short) (cpu.e&0xff);
 				cpu.sp = (cpu.sp-2)&0xffff;
+				break;
+			}
+			
+			case 0xdb: { //IN d8
+				//TODO: come back here later
 				break;
 			}
 			
@@ -894,6 +906,11 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xf3: { //DI
+				cpu.interrupt_enable = false;
+				break;
+			}
+			
 			case 0xf5: { //PUSH PSW
 				cpu.memory[cpu.sp-1] = cpu.a;
 				short psw = (short) ((cpu.cc.z | 
@@ -906,6 +923,11 @@ public class Emulation {
 				break;
 			}
 			
+			
+			case 0xfb: { //EI
+				cpu.interrupt_enable = true;
+				break;
+			}
 			
 			default: System.out.println("UNIMPLEMENTED OPCODE: "+"0x"+String.format("%02x", opcode)); System.exit(1); break;
 		}

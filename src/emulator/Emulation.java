@@ -857,6 +857,11 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xd3: { //OUT d8
+				//TODO: come back here later
+				break;
+			}
+			
 			case 0xd5: { //PUSH D
 				cpu.memory[(cpu.sp-1)&0xffff] = (short) (cpu.d&0xff);
 				cpu.memory[(cpu.sp-2)&0xffff] = (short) (cpu.e&0xff);

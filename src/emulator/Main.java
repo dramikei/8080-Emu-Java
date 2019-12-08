@@ -6,8 +6,9 @@ public class Main {
 		CPU cpu = new CPU();
 		Emulation emulator = new Emulation();
 		emulator.loadGame(cpu, "invaders");
-		for(int i =0;i<100000;i++) {
-			// Loop is a placeholder, will be removed in future version.
+		
+		while(true) {
+			//Emulation will be stopped when CPU encounters opcode: 0x76 (HLT)
 			emulator.Emulate8080(cpu);
 		}
 		

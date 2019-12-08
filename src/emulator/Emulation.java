@@ -881,6 +881,20 @@ public class Emulation {
 				cpu.pc = (cpu.pc + 1)&0xffff;
 				break;
 			}
+			
+			case 0xf1: { //POP PSW
+				cpu.a = cpu.memory[(cpu.sp+1)&0xffff];
+				short psw = (short) (cpu.memory[cpu.sp&0xffff]&0xff);
+				cpu.cc.z = (short) ((0x01 == (psw & 0x01)) ? 1:0);
+				cpu.cc.s = (short) ((0x02 == (psw & 0x02)) ? 1:0);
+				cpu.cc.p = (short) ((0x04 == (psw & 0x04)) ? 1:0);
+				cpu.cc.cy = (short) ((0x05 == (psw & 0x05)) ? 1:0);
+				cpu.cc.ac = (short) ((0x10 == (psw & 0x10)) ? 1:0);
+				cpu.sp = (cpu.sp +2)&0xffff;
+				break;
+			}
+			
+			
 			default: System.out.println("UNIMPLEMENTED OPCODE: "+"0x"+String.format("%02x", opcode)); System.exit(1); break;
 		}
 		cpu.pc = (cpu.pc+1)&0xffff;

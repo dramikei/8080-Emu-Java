@@ -425,6 +425,12 @@ public class Emulation {
 				cpu.cc.cy = (short) (cpu.cc.cy == 0 ? 1:0);
 				break;
 			}
+			
+			case 0x4e: { //MOV C,M
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.c = cpu.memory[addr];
+				break;
+			}
 
 			case 0x56: { //MOV D,M
 				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
@@ -898,6 +904,12 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xeb: { //XCHG
+				cpu.h = cpu.d;
+				cpu.l = cpu.e;
+				break;
+			}
+			
 			case 0xf1: { //POP PSW
 				cpu.a = cpu.memory[(cpu.sp+1)&0xffff];
 				short psw = (short) (cpu.memory[cpu.sp&0xffff]&0xff);
@@ -931,6 +943,15 @@ public class Emulation {
 			case 0xfb: { //EI
 				cpu.interrupt_enable = true;
 				break;
+			}
+			
+			case 0xfe: { //CPI d8
+				short x = (short)((cpu.a - cpu.memory[(cpu.pc +1)&0xffff])&0xff);
+				cpu.cc.z = (short)((x==0)?1:0);
+				cpu.cc.s = (short)((0x80 == (x & 0x80))?1:0);
+				set_cc_parity(x,cpu);
+				cpu.cc.cy = (short)((cpu.a < cpu.memory[cpu.pc+1])?1:0);
+				cpu.pc = (cpu.pc+1)&0xffff;
 			}
 			
 			default: System.out.println("UNIMPLEMENTED OPCODE: "+"0x"+String.format("%02x", opcode)); System.exit(1); break;

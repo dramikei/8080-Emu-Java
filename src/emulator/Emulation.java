@@ -51,7 +51,7 @@ public class Emulation {
 	
 	void Emulate8080(CPU cpu) {
 		short opcode = cpu.memory[cpu.pc];
-		System.out.println(String.format("%02x", cpu.pc)+":	0x"+String.format("%02x", opcode));
+		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode));
 		System.out.println("");
 		switch(opcode) {
 			case 0x00: { break; } //NOP
@@ -243,8 +243,9 @@ public class Emulation {
 			}
 			
 			case 0x23: { //INX H
-				cpu.h = (short) ((cpu.h + 1) & 0xff);
-				cpu.l = (short) ((cpu.l + 1) & 0xff);
+				short ans = (short)((((cpu.h&0xff)<<8)|cpu.l&0xff) - 1);
+				cpu.h = (short)((ans>>8)&0xff);
+				cpu.l = (short)(ans&0xff);
 				break;
 			}
 			
@@ -426,6 +427,12 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x46: { //MOV B,M
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.b = cpu.memory[addr];
+				break;
+			}
+			
 			case 0x4e: { //MOV C,M
 				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
 				cpu.c = cpu.memory[addr];
@@ -441,6 +448,11 @@ public class Emulation {
 			case 0x5e: { //MOV E,M
 				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
 				cpu.d = cpu.memory[addr];
+				break;
+			}
+			
+			case 0x61: { //MOV H,C
+				cpu.h = cpu.c;
 				break;
 			}
 
@@ -789,6 +801,13 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xc0: { //RNZ
+				if (cpu.cc.z != 0) {
+					ret(cpu);
+				}
+				break;
+			}
+			
 			case 0xc1: { //POP B
 				cpu.c = cpu.memory[cpu.sp];
 				cpu.b = cpu.memory[(cpu.sp+1)&0xffff];
@@ -797,8 +816,13 @@ public class Emulation {
 			}
 
 			case 0xc2: { //JNZ addr
-				if (cpu.cc.z == 1) {
+				System.out.println(cpu.cc.z);
+				System.out.println(cpu.b);
+				System.out.println(cpu.cc.z == 0);
+				if (cpu.cc.z == 0) {
 					jump_to_addr(cpu);
+				}else {
+					cpu.pc = (cpu.pc+2)&0xffff;
 				}
 				break;
 			}
@@ -834,6 +858,8 @@ public class Emulation {
 			case 0xca: { //JZ addr
 				if (cpu.cc.z == 1) {
 					jump_to_addr(cpu);
+				} else {
+					cpu.pc = (cpu.pc+2)&0xffff;
 				}
 				break;
 			}
@@ -990,7 +1016,8 @@ public class Emulation {
 	}
 	
 	void ret(CPU cpu) {
-		cpu.pc = (cpu.memory[cpu.sp&0xffff]&0xff) | ((cpu.memory[(cpu.sp+1)&0xffff] << 8)&0xff);
+		System.out.println(String.format("%x",cpu.memory[0x5e]));
+		cpu.pc = ((cpu.memory[(cpu.sp+1)&0xffff]&0xff) << 8) | (cpu.memory[cpu.sp&0xffff]&0xff);
 		cpu.sp = (cpu.sp + 2)&0xffff;
 	}
 	

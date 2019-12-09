@@ -243,7 +243,7 @@ public class Emulation {
 			}
 			
 			case 0x23: { //INX H
-				short ans = (short)((((cpu.h&0xff)<<8)|cpu.l&0xff) - 1);
+				short ans = (short)((((cpu.h&0xff)<<8)|cpu.l&0xff) + 1);
 				cpu.h = (short)((ans>>8)&0xff);
 				cpu.l = (short)(ans&0xff);
 				break;
@@ -816,12 +816,9 @@ public class Emulation {
 			}
 
 			case 0xc2: { //JNZ addr
-				System.out.println(cpu.cc.z);
-				System.out.println(cpu.b);
-				System.out.println(cpu.cc.z == 0);
 				if (cpu.cc.z == 0) {
 					jump_to_addr(cpu);
-				}else {
+				} else {
 					cpu.pc = (cpu.pc+2)&0xffff;
 				}
 				break;
@@ -978,6 +975,7 @@ public class Emulation {
 				set_cc_parity(x,cpu);
 				cpu.cc.cy = (short)((cpu.a < cpu.memory[cpu.pc+1])?1:0);
 				cpu.pc = (cpu.pc+1)&0xffff;
+				break;
 			}
 			
 			default: System.out.println("UNIMPLEMENTED OPCODE: "+"0x"+String.format("%02x", opcode)); System.exit(1); break;
@@ -1016,7 +1014,6 @@ public class Emulation {
 	}
 	
 	void ret(CPU cpu) {
-		System.out.println(String.format("%x",cpu.memory[0x5e]));
 		cpu.pc = ((cpu.memory[(cpu.sp+1)&0xffff]&0xff) << 8) | (cpu.memory[cpu.sp&0xffff]&0xff);
 		cpu.sp = (cpu.sp + 2)&0xffff;
 	}

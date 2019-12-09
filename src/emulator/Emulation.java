@@ -336,6 +336,7 @@ public class Emulation {
 			
 			case 0x32: { //STA addr
 				int addr = (((cpu.memory[cpu.pc+2]&0xff)<<8) | (cpu.memory[cpu.pc+1])&0xff)&0xffff;
+				System.out.println(String.format("%x", addr));
 				cpu.memory[addr] = cpu.a;
 				cpu.pc = (cpu.pc+2)&0xffff;
 				break;
@@ -389,6 +390,8 @@ public class Emulation {
 
 			case 0x3a: { //LDA addr
 				int addr = (((cpu.memory[cpu.pc+2]&0xff)<<8) | (cpu.memory[cpu.pc+1])&0xff)&0xffff;
+				System.out.println(String.format("%x", addr));
+				System.out.println(cpu.memory[addr]);
 				cpu.a = cpu.memory[addr];
 				cpu.pc = (cpu.pc + 2)&0xffff;
 				break;
@@ -409,7 +412,8 @@ public class Emulation {
 			}
 			
 			case 0x3d: { //DCR A
-				short ans = (short) (cpu.a -1);
+				short ans = (short) (cpu.a - 1);
+				System.out.println(ans);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
@@ -419,6 +423,7 @@ public class Emulation {
 
 			case 0x3e: { //MVI A,D8
 				cpu.a = (short) (cpu.memory[cpu.pc + 1]&0xff);
+				cpu.pc = (cpu.pc+1)&0xffff;
 				break;
 			}
 			
@@ -887,6 +892,7 @@ public class Emulation {
 			
 			case 0xd3: { //OUT d8
 				//TODO: come back here later
+				cpu.pc = (cpu.pc+1)&0xffff;
 				break;
 			}
 			
@@ -899,6 +905,7 @@ public class Emulation {
 			
 			case 0xdb: { //IN d8
 				//TODO: come back here later
+				cpu.pc = (cpu.pc+1)&0xffff;
 				break;
 			}
 			
@@ -985,6 +992,7 @@ public class Emulation {
 	
 	void set_cc_zero(short ans, CPU cpu ) {
 		cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
+		System.out.println(cpu.cc.z);
 	}
 	void set_cc_sign(short ans, CPU cpu) {
 		cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);

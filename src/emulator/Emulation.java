@@ -659,51 +659,83 @@ public class Emulation {
 			}
 
 			case 0xa0: { //ANA B
-				cpu.a = (short) ((cpu.a&cpu.b)&0xff);
+				short ans = (short) ((cpu.a&cpu.b)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xa1: { //ANA C
-				cpu.a = (short) ((cpu.a&cpu.c)&0xff);
+				short ans = (short) ((cpu.a&cpu.c)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xa2: { //ANA D
-				cpu.a = (short) ((cpu.a&cpu.d)&0xff);
+				short ans = (short) ((cpu.a&cpu.d)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xa3: { //ANA E
-				cpu.a = (short) ((cpu.a&cpu.e)&0xff);
+				short ans = (short) ((cpu.a&cpu.e)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xa4: { //ANA H
-				cpu.a = (short) ((cpu.a&cpu.h)&0xff);
+				short ans = (short) ((cpu.a&cpu.h)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xa5: { //ANA L
-				cpu.a = (short) ((cpu.a&cpu.l)&0xff);
+				short ans = (short) ((cpu.a&cpu.l)&0xff); 
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xa6: { //ANA M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
-				cpu.a = (short) ((cpu.a&cpu.memory[offset&0xffff])&0xff);
+				short ans = (short) ((cpu.a&cpu.memory[offset&0xffff])&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xa7: { //ANA A
-				cpu.a = (short) ((cpu.a&cpu.a)&0xff);
+				short ans = (short)((cpu.a&cpu.a)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 

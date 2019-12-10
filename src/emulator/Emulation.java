@@ -740,101 +740,165 @@ public class Emulation {
 			}
 
 			case 0xa8: { //XRA B
-				cpu.a = (short) ((cpu.a^cpu.b)&0xff);
+				short ans = (short) ((cpu.a^cpu.b)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 			
 			case 0xa9: { //XRA C
-				cpu.a = (short) ((cpu.a^cpu.c)&0xff);
+				short ans = (short) ((cpu.a^cpu.c)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xaa: { //XRA D
-				cpu.a = (short) ((cpu.a^cpu.d)&0xff);
+				short ans = (short) ((cpu.a^cpu.d)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xab: { //XRA E
-				cpu.a = (short) ((cpu.a^cpu.e)&0xff);
+				short ans = (short) ((cpu.a^cpu.e)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xac: { //XRA H
-				cpu.a = (short) ((cpu.a^cpu.h)&0xff);
+				short ans = (short) ((cpu.a^cpu.h)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xad: { //XRA L
-				cpu.a = (short) ((cpu.a^cpu.l)&0xff);
+				short ans = (short) ((cpu.a^cpu.l)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xae: { //XRA M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
-				cpu.a = (short) ((cpu.a^cpu.memory[offset&0xffff])&0xff);
+				short ans = (short) ((cpu.a^cpu.memory[offset&0xffff])&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xaf: { //XRA A
-				cpu.a = (short) ((cpu.a^cpu.a)&0xff);
+				short ans = (short) ((cpu.a^cpu.a)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xb0: { //ORA B
-				cpu.a = (short) ((cpu.a|cpu.b)&0xff);
+				short ans = (short) ((cpu.a|cpu.b)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xb1: { //ORA C
-				cpu.a = (short) ((cpu.a|cpu.c)&0xff);
+				short ans = (short) ((cpu.a|cpu.c)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 
 			case 0xb2: { //ORA D
-				cpu.a = (short) ((cpu.a|cpu.d)&0xff);
+				short ans = (short) ((cpu.a|cpu.d)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xb3: { //ORA E
-				cpu.a = (short) ((cpu.a|cpu.e)&0xff);
+				short ans = (short) ((cpu.a|cpu.e)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xb4: { //ORA H
-				cpu.a = (short) ((cpu.a|cpu.h)&0xff);
+				short ans = (short) ((cpu.a|cpu.h)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xb5: { //ORA L
-				cpu.a = (short) ((cpu.a|cpu.l)&0xff);
+				short ans = (short) ((cpu.a|cpu.l)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xb6: { //ORA M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
-				cpu.a = (short) ((cpu.a|cpu.memory[offset&0xffff])&0xff);
+				short ans = (short) ((cpu.a|cpu.memory[offset&0xffff])&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 
 			case 0xb7: { //ORA A
-				cpu.a = (short) ((cpu.a|cpu.a)&0xff);
+				short ans = (short) ((cpu.a|cpu.a)&0xff);
+				cpu.a = ans;
 				cpu.cc.cy = 0;
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
 				break;
 			}
 			

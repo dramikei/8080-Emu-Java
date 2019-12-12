@@ -31,7 +31,12 @@ public class Emulation {
 	 *  
 	 *  Google if you don't know about signed and unsigned data types.
 	 */
-	
+	void GenerateInterrupt(CPU cpu, int interrupt_num) {
+//		cpu.memory[(cpu.sp-1)&0xffff] = (short) (cpu.pc&0xff00>>8);
+//		cpu.memory[(cpu.sp-2)&0xffff] = (short) (cpu.pc&0xff);
+//		cpu.sp = (cpu.sp-2)&0xffff;
+//		cpu.pc = 8*interrupt_num;
+	}
 	
 	void loadGame(CPU cpu, String name) {
 		File file = new File(System.getProperty("user.dir") + "/src/Games/" + name);
@@ -336,7 +341,6 @@ public class Emulation {
 			
 			case 0x32: { //STA addr
 				int addr = (((cpu.memory[cpu.pc+2]&0xff)<<8) | (cpu.memory[cpu.pc+1])&0xff)&0xffff;
-				System.out.println(String.format("%x", addr));
 				cpu.memory[addr] = cpu.a;
 				cpu.pc = (cpu.pc+2)&0xffff;
 				break;
@@ -390,8 +394,6 @@ public class Emulation {
 
 			case 0x3a: { //LDA addr
 				int addr = (((cpu.memory[cpu.pc+2]&0xff)<<8) | (cpu.memory[cpu.pc+1])&0xff)&0xffff;
-				System.out.println(String.format("%x", addr));
-				System.out.println(cpu.memory[addr]);
 				cpu.a = cpu.memory[addr];
 				cpu.pc = (cpu.pc + 2)&0xffff;
 				break;
@@ -413,7 +415,6 @@ public class Emulation {
 			
 			case 0x3d: { //DCR A
 				short ans = (short) (cpu.a - 1);
-				System.out.println(ans);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
@@ -948,6 +949,13 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xc8: {
+				if(cpu.cc.z == 1) {
+					ret(cpu);
+				}
+				break;
+			}
+			
 			case 0xc9: { //RET
 				ret(cpu);
 				break;
@@ -998,6 +1006,7 @@ public class Emulation {
 				cpu.sp = (cpu.sp-2)&0xffff;
 				break;
 			}
+			
 			
 			case 0xdb: { //IN d8
 				//TODO: come back here later
@@ -1088,7 +1097,6 @@ public class Emulation {
 	
 	void set_cc_zero(short ans, CPU cpu ) {
 		cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
-		System.out.println(cpu.cc.z);
 	}
 	void set_cc_sign(short ans, CPU cpu) {
 		cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);

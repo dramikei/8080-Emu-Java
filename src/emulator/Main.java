@@ -5,14 +5,13 @@ import java.time.Instant;
 import javax.swing.JFrame;
 
 public class Main {
-	public static CPU cpu;
 	static long lastInterrupt = 0;
 	public static void main(String[] args) {
-		cpu = new CPU();
+		CPU cpu = new CPU();
 		Emulation emulator = new Emulation();
 		emulator.loadGame(cpu, "invaders");
 		JFrame f = new JFrame();
-		Screen screen = new Screen();
+		Screen screen = new Screen(cpu);
 //		frame.setSize(800, 600);
 		f.add(screen);
 		f.pack();
@@ -28,12 +27,8 @@ public class Main {
 				if (cpu.interrupt_enable) {
 					emulator.GenerateInterrupt(cpu,2);
 					lastInterrupt = Instant.now().toEpochMilli();
-					
+					f.repaint();
 				}
-			}
-			x++;
-			if(x>100000) {
-				f.repaint();
 			}
 		}
 		

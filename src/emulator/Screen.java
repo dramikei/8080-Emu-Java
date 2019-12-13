@@ -12,8 +12,11 @@ public class Screen extends JPanel {
 	private int scale = 1;
 	private int width = 224 * scale;
     private int height = 256 * scale;
+    private CPU cpu;
+    private short[] display;
     
-	public Screen() {
+	public Screen(CPU cpu) {
+		this.cpu = cpu;
 		System.out.println("Screen initialised.");
 	}
 	
@@ -50,12 +53,17 @@ public class Screen extends JPanel {
     private void paintFullScreen() {
         width=getWidth();
         height=getHeight();
-        for (int y = 0; y < 224; y++) {
-            for (int x = 0; x < 32; x++) {
-                for (int z = 0; z<8;z++){
-                	boolean value = (Main.cpu.memory[0x200+x+y]>>z)%2 == 0 ? false : true;
-                    paintPixel(value,y , 256-(x*8+z));
-                }
+        for (int y = 0; y < 256; y++) {
+            for (int x = 0; x < 224; x++) {
+//                for (int z = 0; z<8;z++){
+//                	boolean value = cpu.memory[0x2400];
+//                    
+//                }
+            	
+            	
+            	int b = cpu.memory[0x2400 + (y * (height / 8) + (x / 8))];
+            	boolean value = (b & (1 << (7 - (x % 8)))) > 0 ? true : false; //byte & (1 << (x % 8))
+            	paintPixel(value,y ,x);
             }
         }
     }

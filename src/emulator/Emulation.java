@@ -32,10 +32,12 @@ public class Emulation {
 	 *  Google if you don't know about signed and unsigned data types.
 	 */
 	void GenerateInterrupt(CPU cpu, int interrupt_num) {
-//		cpu.memory[(cpu.sp-1)&0xffff] = (short) (cpu.pc&0xff00>>8);
-//		cpu.memory[(cpu.sp-2)&0xffff] = (short) (cpu.pc&0xff);
-//		cpu.sp = (cpu.sp-2)&0xffff;
-//		cpu.pc = 8*interrupt_num;
+		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((cpu.pc >> 8) & 0xff);
+		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (cpu.pc & 0xff);
+		cpu.sp = (cpu.sp-2)&0xffff;
+		
+		cpu.pc = 8*interrupt_num;
+		cpu.interrupt_enable = false;
 	}
 	
 	void loadGame(CPU cpu, String name) {
@@ -1004,6 +1006,15 @@ public class Emulation {
 				cpu.memory[(cpu.sp-1)&0xffff] = (short) (cpu.d&0xff);
 				cpu.memory[(cpu.sp-2)&0xffff] = (short) (cpu.e&0xff);
 				cpu.sp = (cpu.sp-2)&0xffff;
+				break;
+			}
+			
+			case 0xda: { //JC adr
+				if (cpu.cc.cy ==1) {
+					jump_to_addr(cpu);
+				} else {
+					cpu.pc = (cpu.pc+2)&0xffff;
+				}
 				break;
 			}
 			

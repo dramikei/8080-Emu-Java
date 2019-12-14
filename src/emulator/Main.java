@@ -1,5 +1,6 @@
 package emulator;
 
+
 import java.time.Instant;
 
 import javax.swing.JFrame;
@@ -19,17 +20,58 @@ public class Main {
         f.setVisible(true);
         f.setFocusable(true);
         f.requestFocusInWindow();
-        int x = 0;
 		while(true) {
 			//Emulation will be stopped when CPU encounters opcode: 0x76 (HLT)
-			emulator.Emulate8080(cpu);
-			if(Instant.now().toEpochMilli() - lastInterrupt > 1.0/60.0) {
-				if (cpu.interrupt_enable) {
-					emulator.GenerateInterrupt(cpu,2);
-					lastInterrupt = Instant.now().toEpochMilli();
-					f.repaint();
-				}
+			
+			double now = Instant.now().toEpochMilli();
+//			System.out.println(now);
+//			System.out.println(cpu.lastTimer);
+			if(cpu.lastTimer == 0.0) {
+				cpu.lastTimer = now;
+				cpu.nextInterrupt = cpu.lastTimer + 16.0;
+				cpu.whichInterrupt = 1;
 			}
+			if(now - cpu.lastTimer >= 16) {
+				f.repaint();
+			}
+			if ((cpu.interrupt_enable) && (now>cpu.nextInterrupt)) {
+				if (cpu.whichInterrupt == 1) {
+					emulator.GenerateInterrupt(cpu,1);
+					cpu.whichInterrupt = 2;
+	            }
+	            else {
+	            	emulator.GenerateInterrupt(cpu,2);
+	            	cpu.whichInterrupt = 1;
+	            }    
+				cpu.nextInterrupt = now + 8.0;
+			}
+			
+			double sinceLast = now - cpu.lastTimer;
+			int cycles_to_catch_up = (int)(2 * sinceLast);
+	        int cycles = 0;
+			
+	        
+	        while (cycles_to_catch_up > cycles) {
+//	        	System.out.println(now);
+//				System.out.println(cpu.lastTimer);
+	        	short op = cpu.memory[cpu.pc];
+	            if (op == 0xdb) { //machine specific handling for IN
+	                //TODO
+	                cpu.pc += 2;
+	                cycles+=3;
+	            }
+	            else if (op == 0xd3) { //machine specific handling for OUT
+	            	//TODO
+	                cpu.pc += 2;
+	                cycles+=3;
+//	                cpu.playSounds();
+	            }
+	            else
+	                cycles += emulator.Emulate8080(cpu);
+	            
+	        }
+			
+			
 		}
 		
 	}

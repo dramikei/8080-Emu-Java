@@ -11,6 +11,9 @@ public class CPU {
 	int sp;
 	int pc;
 	short[] memory;
+	double lastTimer;    
+    double nextInterrupt;    
+    int whichInterrupt;
 	boolean interrupt_enable;
 	ConditionCode cc;
 	
@@ -25,6 +28,10 @@ public class CPU {
 		sp = 0x0;
 		pc = 0x0;
 		memory = new short[0xffff];
+		lastTimer = 0.0;
+		nextInterrupt = 0.0;
+		whichInterrupt = 0;
+		interrupt_enable = false;
 		cc = new ConditionCode();
 	}
 	

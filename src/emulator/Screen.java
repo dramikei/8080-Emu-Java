@@ -13,10 +13,11 @@ public class Screen extends JPanel {
 	private int width = 224 * scale;
     private int height = 256 * scale;
     private CPU cpu;
-    private short[] display;
+    private int[] arry;
     
 	public Screen(CPU cpu) {
 		this.cpu = cpu;
+		arry = new int[width*height];
 		System.out.println("Screen initialised.");
 	}
 	
@@ -44,30 +45,31 @@ public class Screen extends JPanel {
         }
 
     }
-	
     
-
     /**
      * Paints full screen from screen memory.
      */
     private void paintFullScreen() {
         width=getWidth();
         height=getHeight();
-        for (int y = 0; y < 256; y++) {
-            for (int x = 0; x < 224; x++) {
-//                for (int z = 0; z<8;z++){
-//                	boolean value = cpu.memory[0x2400];
-//                    
-//                }
-            	
-            	
-            	int b = cpu.memory[0x2400 + (y * (height / 8) + (x / 8))];
-            	boolean value = (b & (1 << (7 - (x % 8)))) > 0 ? true : false; //byte & (1 << (x % 8))
-            	paintPixel(value,y ,x);
-            }
+        int i = 0x2400;
+        for (int col = 0;col<width;col++) {
+        	for (int row = height; row>0; row -=8) {
+        		for (int j = 0; j<8;j++) {
+        			int idx = (row-j)*width+col;
+        			if ((cpu.memory[i] & 1 << j) != 0) {
+        				//White
+        				int x = (int)(idx%width);
+            			int y = (int)(Math.floor(idx/width));
+            			paintPixel(true,x,y);
+        			} else {
+        				//Black
+        			}
+        		}
+        		i++;
+        	}
         }
     }
-
 
     /**
      * Paints full screen from screen memory. Public.

@@ -31,6 +31,31 @@ public class Emulation {
 	 *  
 	 *  Google if you don't know about signed and unsigned data types.
 	 */
+	
+	short cycles8080[] = {
+			4, 10, 7, 5, 5, 5, 7, 4, 4, 10, 7, 5, 5, 5, 7, 4, //0x00..0x0f
+			4, 10, 7, 5, 5, 5, 7, 4, 4, 10, 7, 5, 5, 5, 7, 4, //0x10..0x1f
+			4, 10, 16, 5, 5, 5, 7, 4, 4, 10, 16, 5, 5, 5, 7, 4, //etc
+			4, 10, 13, 5, 10, 10, 10, 4, 4, 10, 13, 5, 5, 5, 7, 4,
+			
+			5, 5, 5, 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 7, 5, //0x40..0x4f
+			5, 5, 5, 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 7, 5,
+			5, 5, 5, 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 7, 5,
+			7, 7, 7, 7, 7, 7, 7, 7, 5, 5, 5, 5, 5, 5, 7, 5,
+			
+			4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, //0x80..8x4f
+			4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+			4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+			4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+			
+			11, 10, 10, 10, 17, 11, 7, 11, 11, 10, 10, 10, 10, 17, 7, 11, //0xc0..0xcf
+			11, 10, 10, 10, 17, 11, 7, 11, 11, 10, 10, 10, 10, 17, 7, 11, 
+			11, 10, 10, 18, 17, 11, 7, 11, 11, 5, 10, 5, 17, 17, 7, 11, 
+			11, 10, 10, 4, 17, 11, 7, 11, 11, 5, 10, 4, 17, 17, 7, 11, 
+		};
+	
+	
+	
 	void GenerateInterrupt(CPU cpu, int interrupt_num) {
 		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((cpu.pc >> 8) & 0xff);
 		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (cpu.pc & 0xff);
@@ -56,7 +81,7 @@ public class Emulation {
 	
 	
 	
-	void Emulate8080(CPU cpu) {
+	int Emulate8080(CPU cpu) {
 		short opcode = cpu.memory[cpu.pc];
 		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode));
 		System.out.println("");
@@ -1146,6 +1171,7 @@ public class Emulation {
 			default: System.out.println("UNIMPLEMENTED OPCODE: "+"0x"+String.format("%02x", opcode)); System.exit(1); break;
 		}
 		cpu.pc = (cpu.pc+1)&0xffff;
+		return cycles8080[opcode];
 	}
 	
 	void set_cc_zero(short ans, CPU cpu ) {

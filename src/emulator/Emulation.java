@@ -155,6 +155,8 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x10: { break; } //NOP
+			
 			case 0x11: { //LXI D, D16
 				cpu.e = cpu.memory[((cpu.pc+1) & 0xffff)];
 				cpu.d = cpu.memory[((cpu.pc+2) & 0xffff)];
@@ -241,6 +243,8 @@ public class Emulation {
 				cpu.a = (short)(((cpu.cc.cy << 7) | (ans >> 1))&0xff);
 				break;
 			}
+			
+			case 0x20: { break; } //NOP
 			
 			case 0x21: { //LXI H
 				cpu.l = cpu.memory[((cpu.pc+1) & 0xffff)];
@@ -996,6 +1000,15 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xd2: {
+				if(cpu.cc.cy == 0) {
+					jump_to_addr(cpu);
+				} else {
+					cpu.pc = (cpu.pc+2)&0xffff;
+				}
+				break;
+			}
+			
 			case 0xd3: { //OUT d8
 				//TODO: come back here later
 				cpu.pc = (cpu.pc+1)&0xffff;
@@ -1053,6 +1066,14 @@ public class Emulation {
 			case 0xeb: { //XCHG
 				cpu.h = cpu.d;
 				cpu.l = cpu.e;
+				break;
+			}
+			
+			case 0xef: { //RST 5
+				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((cpu.pc >> 8) & 0xff);
+				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (cpu.pc & 0xff);
+				cpu.sp = (cpu.sp-2)&0xffff;
+				cpu.pc = 0x20;
 				break;
 			}
 			

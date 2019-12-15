@@ -238,6 +238,12 @@ public class Emulation {
 				cpu.d = (short) (ans & 0xff);
 				break;
 			}
+			
+			case 0x16: { //MVI D,Byte
+				cpu.d = cpu.memory[(cpu.pc+1)&0xffff];
+				cpu.pc = (cpu.pc+1)&0xffff;
+				break;
+			}
 				
 			case 0x18: { break; } //NOP
 			
@@ -484,8 +490,33 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x40: { //MOV B,B
+				cpu.b = cpu.c;
+				break;
+			}
+			
+			case 0x41: { //MOV B,C
+				cpu.b = cpu.c;
+				break;
+			}
+			
 			case 0x42: { //MOV B,D
 				cpu.b = cpu.d;
+				break;
+			}
+			
+			case 0x43: { //MOV B,E
+				cpu.b = cpu.e;
+				break;
+			}
+			
+			case 0x44: { //MOV B,H
+				cpu.b = cpu.h;
+				break;
+			}
+			
+			case 0x45: { //MOV B,L
+				cpu.b = cpu.l;
 				break;
 			}
 			

@@ -136,6 +136,15 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x07: { //RLC
+				short x = (short) (cpu.a&0xff);
+				cpu.a = (short)(((x & 0x80) >> 7) | (x << 1));
+				cpu.cc.cy = (short) ((0x80 == (x&0x80)) ? 1:0);
+				break;
+			}
+			
+			case 0x08: { break; } //NOP
+			
 			case 0x09: { //DAD B
 				int BC = ((cpu.b << 8) | (cpu.c))&0xffff;
 				int HL = ((cpu.h << 8) | (cpu.l))&0xffff;
@@ -1160,6 +1169,15 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xe4: { //CP0 addr
+				if(cpu.cc.p == 0) {
+					call(cpu);
+				} else {
+					cpu.pc = (cpu.pc + 2)&0xffff;
+				}
+				break;
+			}
+			
 			case 0xe5: { //PUSH H
 				cpu.memory[(cpu.sp-1)&0xffff] = (short) (cpu.h&0xff);
 				cpu.memory[(cpu.sp-2)&0xffff] = (short) (cpu.l&0xff);
@@ -1175,6 +1193,11 @@ public class Emulation {
 				cpu.cc.cy = 0;
 				cpu.a = ans;
 				cpu.pc = (cpu.pc + 1)&0xffff;
+				break;
+			}
+			
+			case 0xe9: { //PCHL
+				cpu.pc = (((cpu.h&0xff) << 8) | (cpu.l))&0xffff;
 				break;
 			}
 			

@@ -13,11 +13,9 @@ public class Screen extends JPanel {
 	private int width = 224 * scale;
     private int height = 256 * scale;
     private CPU cpu;
-    private int[] arry;
     
 	public Screen(CPU cpu) {
 		this.cpu = cpu;
-		arry = new int[width*height];
 		System.out.println("Screen initialised.");
 	}
 	

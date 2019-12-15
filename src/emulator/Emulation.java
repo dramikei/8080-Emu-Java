@@ -51,14 +51,15 @@ public class Emulation {
 			11, 10, 10, 10, 17, 11, 7, 11, 11, 10, 10, 10, 10, 17, 7, 11, //0xc0..0xcf
 			11, 10, 10, 10, 17, 11, 7, 11, 11, 10, 10, 10, 10, 17, 7, 11, 
 			11, 10, 10, 18, 17, 11, 7, 11, 11, 5, 10, 5, 17, 17, 7, 11, 
-			11, 10, 10, 4, 17, 11, 7, 11, 11, 5, 10, 4, 17, 17, 7, 11, 
+			11, 10, 10, 4, 17, 11, 7, 11, 11, 5, 10, 4, 17, 17, 7, 11
 		};
 	
 	
 	
 	void GenerateInterrupt(CPU cpu, int interrupt_num) {
-		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((cpu.pc >> 8) & 0xff);
-		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (cpu.pc & 0xff);
+		System.out.println("Pushing to Stack(interrupt): 0x"+String.format("%x", cpu.pc));
+		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) (((cpu.pc-1) >> 8) & 0xff);
+		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) ((cpu.pc-1) & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;
 		
 		cpu.pc = 8*interrupt_num;
@@ -104,8 +105,10 @@ public class Emulation {
 			}
 				
 			case 0x03: { //INX B 
-				cpu.b = (short) ((cpu.b + 1) & 0xff);
 				cpu.c = (short) ((cpu.c + 1) & 0xff);
+				if(cpu.c == 0) {
+					cpu.b = (short) ((cpu.b + 1) & 0xff);
+				}
 				break;
 			}
 			
@@ -140,6 +143,11 @@ public class Emulation {
 				cpu.h = (short)((ans >> 8)&0xff);
 				cpu.l = (short) (ans&0xff);
 				set_cc_carry_pair(ans,cpu);
+				break;
+			}
+			
+			case 0x0a: { //LDAX B
+				cpu.a = cpu.memory[((cpu.b << 8) | (cpu.c))&0xffff];
 				break;
 			}
 			
@@ -198,9 +206,10 @@ public class Emulation {
 			}
 			
 			case 0x13: { //INX D
-				int DE = (((cpu.d << 8) | (cpu.e))&0xffff) + 1;
-				cpu.d = (short) ((DE>>8) & 0xff);
-				cpu.e = (short) ((DE) & 0xff);
+				cpu.e = (short) ((cpu.e+1) & 0xff);
+				if (cpu.e == 0) {
+					cpu.d = (short) ((cpu.d+1) & 0xff);
+				}
 				break;
 			}
 			
@@ -279,9 +288,11 @@ public class Emulation {
 			}
 			
 			case 0x23: { //INX H
-				short ans = (short)((((cpu.h&0xff)<<8)|cpu.l&0xff) + 1);
-				cpu.h = (short)((ans>>8)&0xff);
-				cpu.l = (short)(ans&0xff);
+				
+				cpu.l = (short)((cpu.l+1)&0xff);
+				if (cpu.l == 0) {
+					cpu.h = (short)((cpu.h+1)&0xff);
+				}
 				break;
 			}
 			
@@ -491,6 +502,16 @@ public class Emulation {
 				cpu.d = cpu.memory[addr];
 				break;
 			}
+			
+			case 0x57: { //MOV D,A
+				cpu.d = cpu.a;
+				break;
+			}
+			
+			case 0x5f: { //MOV E,A
+				cpu.e = cpu.a;
+				break;
+			}
 
 			case 0x5e: { //MOV E,M
 				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
@@ -506,6 +527,11 @@ public class Emulation {
 			case 0x66: { //MOV H,M
 				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
 				cpu.h = cpu.memory[addr];
+				break;
+			}
+			
+			case 0x67: { //MOV H,A
+				cpu.h = cpu.a;
 				break;
 			}
 
@@ -1068,6 +1094,13 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xd8: { //RC
+				if(cpu.cc.cy != 0) {
+					ret(cpu);
+				}
+				break;
+			}
+			
 			case 0xda: { //JC adr
 				if (cpu.cc.cy ==1) {
 					jump_to_addr(cpu);
@@ -1206,11 +1239,13 @@ public class Emulation {
 	
 	void ret(CPU cpu) {
 		cpu.pc = ((cpu.memory[(cpu.sp+1)&0xffff]&0xff) << 8) | (cpu.memory[cpu.sp&0xffff]&0xff);
+		System.out.println("Returning to: 0x"+String.format("%x", cpu.pc+1));
 		cpu.sp = (cpu.sp + 2)&0xffff;
 	}
 	
 	void call(CPU cpu) {
 		int ret = (cpu.pc +2)&0xffff;
+		System.out.println("Pushing to Stack(call): 0x"+String.format("%x", ret));
 		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
 		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;

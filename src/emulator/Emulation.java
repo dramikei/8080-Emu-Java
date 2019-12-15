@@ -531,6 +531,36 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x48: { //MOV C,B
+				cpu.c = cpu.b;
+				break;
+			}
+			
+			case 0x49: { //MOV C,C
+				cpu.c = cpu.c;
+				break;
+			}
+			
+			case 0x4a: { //MOV C,D
+				cpu.c = cpu.d;
+				break;
+			}
+			
+			case 0x4b: { //MOV C,E
+				cpu.c = cpu.e;
+				break;
+			}
+			
+			case 0x4c: { //MOV C,H
+				cpu.c = cpu.h;
+				break;
+			}
+			
+			case 0x4d: { //MOV C,L
+				cpu.c = cpu.l;
+				break;
+			}
+			
 			case 0x4e: { //MOV C,M
 				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
 				cpu.c = cpu.memory[addr];
@@ -539,6 +569,11 @@ public class Emulation {
 			
 			case 0x4f: { //MOV C,A
 				cpu.c = cpu.a;
+				break;
+			}
+			
+			case 0x50: { //MOV D,B
+				cpu.d = cpu.b;
 				break;
 			}
 
@@ -564,8 +599,33 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x60: { //MOV H,B
+				cpu.h = cpu.b;
+				break;
+			}
+			
 			case 0x61: { //MOV H,C
 				cpu.h = cpu.c;
+				break;
+			}
+			
+			case 0x62: { //MOV H,D
+				cpu.h = cpu.d;
+				break;
+			}
+			
+			case 0x63: { //MOV H,E
+				cpu.h = cpu.e;
+				break;
+			}
+			
+			case 0x64: { //MOV H,H
+				cpu.h = cpu.h;
+				break;
+			}
+			
+			case 0x65: { //MOV H,L
+				cpu.h = cpu.l;
 				break;
 			}
 
@@ -579,15 +639,81 @@ public class Emulation {
 				cpu.h = cpu.a;
 				break;
 			}
+			
+			case 0x68: { //MOV L,B
+				cpu.l = cpu.b;
+				break;
+			}
+			
+			case 0x69: { //MOV L,C
+				cpu.l = cpu.c;
+				break;
+			}
+			
+			case 0x6a: { //MOV L,D
+				cpu.l = cpu.d;
+				break;
+			}
+			
+			case 0x6b: { //MOV L,E
+				cpu.l = cpu.e;
+				break;
+			}
+			
+			case 0x6c: { //MOV L,H
+				cpu.l = cpu.h;
+				break;
+			}
+			
+			case 0x6d: { //MOV L,L
+				cpu.l = cpu.l;
+				break;
+			}
+			
+			case 0x6e: { //MOV L,M
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.l = cpu.memory[addr];
+				break;
+			}
 
 			case 0x6f: { //MOV L,A
 				cpu.l = cpu.a;
 				break;
 			}
 			
+			case 0x70: { //MOV M,B
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.memory[addr] = cpu.b;
+				break;
+			}
+			
+			case 0x71: { //MOV M,C
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.memory[addr] = cpu.c;
+				break;
+			}
+			
 			case 0x72: { //MOV M,D
 				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
 				cpu.memory[addr] = cpu.d;
+				break;
+			}
+			
+			case 0x73: { //MOV M,E
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.memory[addr] = cpu.e;
+				break;
+			}
+			
+			case 0x74: { //MOV M,H
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.memory[addr] = cpu.h;
+				break;
+			}
+			
+			case 0x75: { //MOV M,L
+				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				cpu.memory[addr] = cpu.l;
 				break;
 			}
 			
@@ -602,6 +728,11 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x78: { //MOV A,B
+				cpu.a = cpu.b;
+				break;
+			}
+			
 			case 0x79: { //MOV A,C
 				cpu.a = cpu.c;
 				break;
@@ -611,24 +742,32 @@ public class Emulation {
 				cpu.a = cpu.d;
 				break;
 			}
+			
 			case 0x7b: { //MOV A,E
 				cpu.a = cpu.e;
 				break;
 			}
+			
 			case 0x7c: { //MOV A,H
 				cpu.a = cpu.h;
 				break;
 			}
+			
 			case 0x7d: { //MOV A,L
 				cpu.a = cpu.l;
 				break;
 			}
+			
 			case 0x7e: { //MOV A,M
 				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
 				cpu.a = cpu.memory[addr];
 				break;
 			}
 			
+			case 0x7f: { //MOV A,A
+				cpu.a = cpu.a;
+				break;
+			}
 			
 			case 0x80: { //ADD B
 				short ans = (short) (cpu.a + cpu.b);

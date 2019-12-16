@@ -355,6 +355,13 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x2a: { //LHLD addr
+				int offset = ((cpu.memory[cpu.pc+2] << 8) | cpu.memory[cpu.pc+1])&0xffff;
+				cpu.l = cpu.memory[offset];
+				cpu.h = cpu.memory[(offset+1)&0xffff];
+				break;
+			}
+			
 			case 0x2b: { //DCX H
 				cpu.h = (short) ((cpu.b - 1) & 0xff);
 				cpu.l = (short) ((cpu.c - 1) & 0xff);
@@ -588,14 +595,14 @@ public class Emulation {
 				break;
 			}
 			
-			case 0x5f: { //MOV E,A
-				cpu.e = cpu.a;
-				break;
-			}
-
 			case 0x5e: { //MOV E,M
 				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
 				cpu.d = cpu.memory[addr];
+				break;
+			}
+			
+			case 0x5f: { //MOV E,A
+				cpu.e = cpu.a;
 				break;
 			}
 			
@@ -1197,6 +1204,15 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xc4: { //CNZ
+				if(cpu.cc.z == 0) {
+					call(cpu);
+				} else {
+					cpu.pc = (cpu.pc+2)&0xffff;
+				}
+				break;
+			}
+			
 			case 0xc5: { //PUSH B
 				cpu.memory[(cpu.sp-1)&0xffff] = (short) (cpu.b&0xff);
 				cpu.memory[(cpu.sp-2)&0xffff] = (short) (cpu.c&0xff);
@@ -1411,6 +1427,17 @@ public class Emulation {
 						cpu.cc.ac << 4)&0xff);
 				cpu.memory[cpu.sp-2] = psw;
 				cpu.sp = (cpu.sp - 2)&0xffff;
+				break;
+			}
+			
+			case 0xf6: { //ORI D8
+				short ans = (short)((cpu.a | cpu.memory[(cpu.pc+1)&0xffff])&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.cc.cy = 0;
+				cpu.a = ans;
+				cpu.pc = (cpu.pc+1)&0xffff;
 				break;
 			}
 			

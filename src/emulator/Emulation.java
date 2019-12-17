@@ -336,15 +336,19 @@ public class Emulation {
 				break;
 			}
 
-//
-///////////// IGNORED as it depends on Auxiliary Carry which is NOT implemented. ////////////////////
-//			case 0x27: { //DAA 
-//
-//				short lsn = (short) (cpu.a&0xf); // Least significant Nibble
-//				short msn = (short) ((cpu.a >> 4)&0xf); // Most significant Nibble
-//				
-//				break;
-//			}
+			case 0x27: { //DAA
+				if ((cpu.a &0xf) > 9) {
+					cpu.a = (short)((cpu.a +6)&0xff);
+				}
+				if ((cpu.a&0xf0) > 0x90) {
+					short res = (short)((cpu.a + 0x60)&0xff);
+					cpu.a = res;
+					set_cc_zero(res,cpu);
+					set_cc_sign(res,cpu);
+					set_cc_parity(res,cpu);
+				}
+				break;
+			}
 			
 			case 0x29: { //DAD H
 				int HL = ((cpu.h << 8) | (cpu.l))&0xffff;
@@ -1248,6 +1252,13 @@ public class Emulation {
 					jump_to_addr(cpu);
 				} else {
 					cpu.pc = (cpu.pc+2)&0xffff;
+				}
+				break;
+			}
+			
+			case 0xcc: { //CZ addr
+				if (cpu.cc.z == 1) {
+					call(cpu);
 				}
 				break;
 			}

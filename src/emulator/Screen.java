@@ -4,14 +4,11 @@ import java.awt.*;
 import javax.swing.*;
 
 public class Screen extends JPanel {
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 	private Graphics g;
-	private int scale = 1;
-	private int width = 224 * scale;
-    private int height = 256 * scale;
+	private int width = 224;
+    private int height = 256;
     private CPU cpu;
     
 	public Screen(CPU cpu) {
@@ -24,24 +21,17 @@ public class Screen extends JPanel {
         return new Dimension(width, height);
     }
 	
-    public void paintPixel(boolean white, int x, int y) {
-        if (white) {
-            if (y > 32 & y <= 64) {
-                g.setColor(Color.RED);
-            } else if (y > 184 && y <= 240 && x >= 0 && x <= 223) {
-                g.setColor(Color.GREEN);
-            } else if (y > 238 & y <= 256 & x >= 16 && x < 132) {
-                g.setColor(Color.GREEN);
-            } else {
-                g.setColor(Color.WHITE);
-            }
-            int newx = (int) (x * width / 224.0);
-            int newy = (int) (y * height / 256.0);
-            int pixelwidth = (int) (((x + 1) * width / 224.0) - newx);
-            int pixelheight = (int) (((y + 1) * height / 256.0) - newy);
-            g.fillRect(newx, newy, pixelwidth, pixelheight);
+    public void paintPixel(int x, int y) {
+    	if (y > 32 & y <= 64) {
+            g.setColor(Color.RED);
+        } else if (y > 184 && y <= 240 && x >= 0 && x <= 223) {
+            g.setColor(Color.GREEN);
+        } else if (y > 238 & y <= 256 & x >= 16 && x < 132) {
+            g.setColor(Color.GREEN);
+        } else {
+            g.setColor(Color.WHITE);
         }
-
+        g.fillRect(x, y, 1, 1);
     }
     
     /**
@@ -59,9 +49,7 @@ public class Screen extends JPanel {
         				//White
         				int x = (int)(idx%width);
             			int y = (int)(Math.floor(idx/width));
-            			paintPixel(true,x,y);
-        			} else {
-        				//Black
+            			paintPixel(x,y);
         			}
         		}
         		i++;
@@ -83,16 +71,9 @@ public class Screen extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         this.g = g;
-
         // Draw background
         g.setColor(Color.BLACK);
-
         g.fillRect(0, 0, width, height);
-
         paintFullScreen();
-
-//        print_messages();
-//        Main.frames_completed++;
     }
-	
 }

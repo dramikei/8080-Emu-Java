@@ -259,6 +259,7 @@ public class Emulation {
 			
 			case 0x1a: { //LDAX D
 				cpu.a = cpu.memory[((cpu.d << 8) | (cpu.e))&0xffff];
+				System.out.println(cpu.memory[((cpu.d << 8) | (cpu.e))&0xffff]);
 				break;
 			}
 			
@@ -352,7 +353,7 @@ public class Emulation {
 			
 			case 0x29: { //DAD H
 				int HL = ((cpu.h << 8) | (cpu.l))&0xffff;
-				int ans = HL <<1;
+				int ans = HL + HL;
 				cpu.h = (short)((ans >> 8)&0xff);
 				cpu.l = (short) (ans&0xff);
 				set_cc_carry_pair(ans,cpu);
@@ -1399,8 +1400,12 @@ public class Emulation {
 			}
 			
 			case 0xeb: { //XCHG
-				cpu.h = cpu.d;
-				cpu.l = cpu.e;
+				short temp1 = cpu.d;
+				short temp2 = cpu.e;
+				cpu.d = cpu.h;
+				cpu.e = cpu.l;
+				cpu.h = temp1;
+				cpu.l = temp2;
 				break;
 			}
 			

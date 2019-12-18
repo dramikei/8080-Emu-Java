@@ -7,9 +7,11 @@ import javax.swing.JFrame;
 
 public class Main {
 	static long lastInterrupt = 0;
+	public static short in_port1;
 	public static void main(String[] args) {
 		CPU cpu = new CPU();
 		Emulation emulator = new Emulation();
+		in_port1 = 0;
 		emulator.loadGame(cpu, "invaders");
 		Screen screen = new Screen(cpu);
 		Frame f = new Frame(screen);

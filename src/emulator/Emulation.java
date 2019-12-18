@@ -1531,6 +1531,9 @@ public class Emulation {
 			case 0: {
 				return 0xf;
 			}
+			case 1: {
+				return Main.in_port1;
+			}
 			case 2: {
 				return 0x0;
 			}

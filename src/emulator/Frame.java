@@ -20,14 +20,50 @@ public class Frame extends JFrame implements KeyListener {
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		//TODO
-		System.out.println(e.getKeyCode());
-		System.exit(1);
+		switch(e.getKeyChar()) {
+			case 'z':
+			case 'Z':
+				Main.in_port1 |= 0x20;
+				break;
+			case 'x':
+			case 'X':
+				Main.in_port1 |= 0x40;
+				break;
+			case '.':
+				Main.in_port1 |= 0x10;
+				break;
+			case 'c':
+			case 'C':
+				Main.in_port1 |= 0x1;
+				break;
+			case '1':
+				Main.in_port1 |= 0x04;
+				break;
+		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		//TODO
+		switch(e.getKeyChar()) {
+			case 'z':
+			case 'Z':
+				Main.in_port1 &= ~0x20;
+				break;
+			case 'x':
+			case 'X':
+				Main.in_port1 &= ~0x40;
+				break;
+			case '.':
+				Main.in_port1 &= ~0x10;
+				break;
+			case 'c':
+			case 'C':
+				Main.in_port1 &= ~0x1;
+				break;
+			case '1':
+				Main.in_port1 &= ~0x04;
+				break;
+		}
 	}
 
 	@Override

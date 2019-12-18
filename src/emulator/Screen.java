@@ -7,12 +7,16 @@ public class Screen extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	private Graphics g;
-	private int width = 224;
-    private int height = 256;
+	private int scale;
+	private int width;
+    private int height;
     private CPU cpu;
     
-	public Screen(CPU cpu) {
+	public Screen(CPU cpu, int displayScale) {
+		this.scale = displayScale;
 		this.cpu = cpu;
+		this.width=224*scale;
+		this.height = 256*scale;
 		System.out.println("Screen initialised.");
 	}
 	
@@ -31,15 +35,19 @@ public class Screen extends JPanel {
         } else {
             g.setColor(Color.WHITE);
         }
-        g.fillRect(x, y, 1, 1);
+    	int newx = (int) (x * width / 224.0);
+        int newy = (int) (y * height / 256.0);
+        int pixelwidth = (int) (((x + 1) * width / 224.0) - newx);
+        int pixelheight = (int) (((y + 1) * height / 256.0) - newy);
+        g.fillRect(newx, newy, pixelwidth, pixelheight);
     }
     
     /**
      * Paints full screen from screen memory.
      */
     private void paintFullScreen() {
-        width=getWidth();
-        height=getHeight();
+        int width=224;
+        int height=256;
         int i = 0x2400;
         for (int col = 0;col<width;col++) {
         	for (int row = height; row>0; row -=8) {

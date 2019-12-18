@@ -13,7 +13,11 @@ public class Main {
 		Emulation emulator = new Emulation();
 		in_port1 = 0;
 		emulator.loadGame(cpu, "invaders");
-		Screen screen = new Screen(cpu);
+		
+		// Screen upscale factor
+		int displayScale = 3;
+		
+		Screen screen = new Screen(cpu, displayScale);
 		Frame f = new Frame(screen);
 		while(true) {
 			//Emulation will be stopped when CPU encounters opcode: 0x76 (HLT)

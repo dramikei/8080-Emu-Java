@@ -11,6 +11,8 @@ public class Frame extends JFrame implements KeyListener {
 		add(screen);
 		setTitle("Space Invaders!");
 		pack();
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setFocusable(true);
         setVisible(true);
         setFocusable(true);

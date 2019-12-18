@@ -936,6 +936,87 @@ public class Emulation {
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
 			}
+			
+			case 0x90: { //SUB B
+				short ans = (short)(cpu.a - cpu.b);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x91: { //SUB C
+				short ans = (short)(cpu.a - cpu.c);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x92: { //SUB D
+				short ans = (short)(cpu.a - cpu.d);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x93: { //SUB E
+				short ans = (short)(cpu.a - cpu.e);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x94: { //SUB H
+				short ans = (short)(cpu.a - cpu.h);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x95: { //SUB L
+				short ans = (short)(cpu.a - cpu.l);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x96: { //SUB M
+				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				short ans = (short)(cpu.a - cpu.memory[(offset)]);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x97: { //SUB A
+				short ans = (short)(cpu.a - cpu.a);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
 
 			case 0xa0: { //ANA B
 				short ans = (short) ((cpu.a&cpu.b)&0xff);
@@ -1525,7 +1606,6 @@ public class Emulation {
 	}
 	
 	short in(CPU cpu, short port) {
-		//TODO: Complete
 		short a = 0;
 		switch(port) {
 			case 0: {

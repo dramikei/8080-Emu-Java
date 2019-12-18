@@ -11,14 +11,8 @@ public class Main {
 		CPU cpu = new CPU();
 		Emulation emulator = new Emulation();
 		emulator.loadGame(cpu, "invaders");
-		JFrame f = new JFrame();
 		Screen screen = new Screen(cpu);
-		f.add(screen);
-		f.pack();
-        f.setFocusable(true);
-        f.setVisible(true);
-        f.setFocusable(true);
-        f.requestFocusInWindow();
+		Frame f = new Frame(screen);
 		while(true) {
 			//Emulation will be stopped when CPU encounters opcode: 0x76 (HLT)
 			double now = Instant.now().toEpochMilli();

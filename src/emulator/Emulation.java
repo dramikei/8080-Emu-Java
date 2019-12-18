@@ -1345,7 +1345,7 @@ public class Emulation {
 			
 			
 			case 0xdb: { //IN d8
-				//TODO: come back here later
+				cpu.a = in(cpu, cpu.memory[(cpu.pc+1)&0xffff]);
 				cpu.pc = (cpu.pc+1)&0xffff;
 				break;
 			}
@@ -1522,6 +1522,22 @@ public class Emulation {
 		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;
 		jump_to_addr(cpu);
+	}
+	
+	short in(CPU cpu, short port) {
+		//TODO: Complete
+		short a = 0;
+		switch(port) {
+			case 0: {
+				return 0xf;
+			}
+			case 2: {
+				return 0x0;
+			}
+			default:
+				return a;
+			
+		}
 	}
 
 }

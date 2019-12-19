@@ -1272,6 +1272,79 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xb8: { //CMP B
+				short ans = (short)((cpu.a - cpu.b)&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				set_cc_carry(ans,cpu);
+				break;
+			}
+			
+			case 0xb9: { //CMP C
+				short ans = (short)((cpu.a - cpu.c)&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				set_cc_carry(ans,cpu);
+				break;
+			}
+			
+			case 0xba: { //CMP D
+				short ans = (short)((cpu.a - cpu.d)&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				set_cc_carry(ans,cpu);
+				break;
+			}
+			
+			case 0xbb: { //CMP E
+				short ans = (short)((cpu.a - cpu.e)&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				set_cc_carry(ans,cpu);
+				break;
+			}
+			
+			case 0xbc: { //CMP H
+				short ans = (short)((cpu.a - cpu.h)&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				set_cc_carry(ans,cpu);
+				break;
+			}
+			
+			case 0xbd: { //CMP L
+				short ans = (short)((cpu.a - cpu.l)&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				set_cc_carry(ans,cpu);
+				break;
+			}
+			
+			case 0xbe: { //CMP M
+				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
+				short ans = (short)((cpu.a - cpu.memory[offset])&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				set_cc_carry(ans,cpu);
+				break;
+			}
+			
+			case 0xbf: { //CMP A
+				short ans = (short)((cpu.a - cpu.a)&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+				set_cc_carry(ans,cpu);
+				break;
+			}
+			
 			case 0xc0: { //RNZ
 				if (cpu.cc.z != 0) {
 					ret(cpu);

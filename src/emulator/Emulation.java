@@ -303,6 +303,14 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x22: { //SHLD addr
+				int offset = (cpu.memory[(cpu.pc+1)&0xffff]<<8) | cpu.memory[cpu.pc&0xffff];
+				cpu.memory[offset] = cpu.l;
+				cpu.memory[(offset+1)&0xffff] = cpu.h;
+				cpu.pc = ((cpu.pc + 2) & 0xffff);
+				break;
+			}
+			
 			case 0x23: { //INX H
 				
 				cpu.l = (short)((cpu.l+1)&0xff);
@@ -350,6 +358,8 @@ public class Emulation {
 				}
 				break;
 			}
+			
+			case 0x28: { break; } //NOP
 			
 			case 0x29: { //DAD H
 				int HL = ((cpu.h << 8) | (cpu.l))&0xffff;
@@ -1391,6 +1401,15 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xd4: { //CNC addr
+				if (cpu.cc.cy == 0) {
+					call(cpu);
+				} else {
+					cpu.pc = ((cpu.pc + 2) & 0xffff);
+				}
+				break;
+			}
+			
 			case 0xd5: { //PUSH D
 				cpu.memory[(cpu.sp-1)&0xffff] = (short) (cpu.d&0xff);
 				cpu.memory[(cpu.sp-2)&0xffff] = (short) (cpu.e&0xff);
@@ -1535,6 +1554,13 @@ public class Emulation {
 				cpu.cc.cy = 0;
 				cpu.a = ans;
 				cpu.pc = (cpu.pc+1)&0xffff;
+				break;
+			}
+			
+			case 0xf8: { //RM
+				if(cpu.cc.s != 0) {
+					ret(cpu);
+				}
 				break;
 			}
 			

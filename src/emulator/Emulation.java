@@ -113,7 +113,7 @@ public class Emulation {
 			}
 			
 			case 0x04: { //INR B
-				short ans = (short) (cpu.b +1);
+				short ans = (short) ((cpu.b +1)&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
@@ -122,7 +122,7 @@ public class Emulation {
 			}
 			
 			case 0x05: { //DCR B
-				short ans = (short) (cpu.b -1);
+				short ans = (short) ((cpu.b -1)&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
@@ -161,13 +161,14 @@ public class Emulation {
 			}
 			
 			case 0x0b: { //DCX B
-				cpu.b = (short) ((cpu.b - 1) & 0xff);
-				cpu.c = (short) ((cpu.c - 1) & 0xff);
+				cpu.c = (short)((cpu.c-1)&0xff);
+				if (cpu.c==0xff)
+					cpu.b=(short)((cpu.b-1)&0xff);
 				break;
 			}
 			
 			case 0x0c: { //INR C
-				short ans = (short) (cpu.c + 1);
+				short ans = (short) ((cpu.c + 1)&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
@@ -176,7 +177,7 @@ public class Emulation {
 			}
 			
 			case 0x0d: { //DCR C
-				short ans = (short) (cpu.c -1);
+				short ans = (short) ((cpu.c -1)&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
@@ -259,7 +260,7 @@ public class Emulation {
 			
 			case 0x1a: { //LDAX D
 				cpu.a = cpu.memory[((cpu.d << 8) | (cpu.e))&0xffff];
-				System.out.println(cpu.memory[((cpu.d << 8) | (cpu.e))&0xffff]);
+//				System.out.println(cpu.memory[((cpu.d << 8) | (cpu.e))&0xffff]);
 				break;
 			}
 			
@@ -378,8 +379,9 @@ public class Emulation {
 			}
 			
 			case 0x2b: { //DCX H
-				cpu.h = (short) ((cpu.b - 1) & 0xff);
-				cpu.l = (short) ((cpu.c - 1) & 0xff);
+				cpu.l = (short)((cpu.l - 1)&0xff);
+				if (cpu.l==0xff)
+					cpu.h = (short)((cpu.h - 1)&0xff);
 				break;
 			}
 			
@@ -1424,6 +1426,8 @@ public class Emulation {
 			case 0xcc: { //CZ addr
 				if (cpu.cc.z == 1) {
 					call(cpu);
+				} else {
+					cpu.pc = (cpu.pc+2)&0xffff;
 				}
 				break;
 			}

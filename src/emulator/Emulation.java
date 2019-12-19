@@ -260,13 +260,14 @@ public class Emulation {
 			
 			case 0x1a: { //LDAX D
 				cpu.a = cpu.memory[((cpu.d << 8) | (cpu.e))&0xffff];
-//				System.out.println(cpu.memory[((cpu.d << 8) | (cpu.e))&0xffff]);
 				break;
 			}
 			
 			case 0x1b: { //DCX D
-				cpu.d = (short) ((cpu.b - 1) & 0xff);
-				cpu.e = (short) ((cpu.c - 1) & 0xff);
+				cpu.e = (short)((cpu.e-1)&0xff);
+				if (cpu.e==0xff) {
+					cpu.d = (short)((cpu.d-1)&0xff);
+				}
 				break;
 			}
 			

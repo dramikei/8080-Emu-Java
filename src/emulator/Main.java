@@ -27,8 +27,7 @@ public class Main {
 				cpu.nextInterrupt = cpu.lastTimer + 16.0;
 				cpu.whichInterrupt = 1;
 			}
-			if(now - cpu.lastTimer >= 16) {
-//				screen.paintScreen();
+			if(now - cpu.lastTimer >= 16.66) {
 				f.repaint();
 			}
 			if ((cpu.interrupt_enable) && (now>cpu.nextInterrupt)) {

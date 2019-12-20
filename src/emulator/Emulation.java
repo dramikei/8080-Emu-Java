@@ -63,6 +63,7 @@ public class Emulation {
 		cpu.sp = (cpu.sp-2)&0xffff;
 		
 		cpu.pc = 8*interrupt_num;
+		System.out.println("PC is at: 0x"+String.format("%x", cpu.pc));
 		cpu.interrupt_enable = false;
 	}
 	
@@ -1532,6 +1533,13 @@ public class Emulation {
 				cpu.l = cpu.memory[cpu.sp];
 				cpu.h = cpu.memory[(cpu.sp+1)&0xffff];
 				cpu.sp = (cpu.sp + 2)&0xffff;
+				break;
+			}
+			
+			case 0xe2: { //JPO addr
+				if (cpu.cc.p == 0) {
+					jump_to_addr(cpu);
+				}
 				break;
 			}
 			

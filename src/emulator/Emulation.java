@@ -1583,7 +1583,10 @@ public class Emulation {
 			}
 			
 			case 0xe9: { //PCHL
-				cpu.pc = (((cpu.h&0xff) << 8) | (cpu.l))&0xffff;
+				int addr = (((cpu.h&0xff) << 8) | (cpu.l))&0xffff;
+				System.out.println(addr);
+				cpu.pc = addr;
+				cpu.pc = (cpu.pc - 1)&0xffff; //PC will be incremented at the end.
 				break;
 			}
 			
@@ -1597,13 +1600,14 @@ public class Emulation {
 				break;
 			}
 			
-			case 0xef: { //RST 5
-				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((cpu.pc >> 8) & 0xff);
-				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (cpu.pc & 0xff);
-				cpu.sp = (cpu.sp-2)&0xffff;
-				cpu.pc = 0x20;
-				break;
-			}
+//			case 0xef: { //RST 5
+			//TODO: Check
+//				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((cpu.pc >> 8) & 0xff);
+//				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (cpu.pc & 0xff);
+//				cpu.sp = (cpu.sp-2)&0xffff;
+//				cpu.pc = 0x20;
+//				break;
+//			}
 			
 			case 0xf1: { //POP PSW
 				cpu.a = cpu.memory[(cpu.sp+1)&0xffff];

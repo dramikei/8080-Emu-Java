@@ -12,11 +12,18 @@ public class Main {
 		CPU cpu = new CPU();
 		Emulation emulator = new Emulation();
 		in_port1 = 0;
-		emulator.loadGame(cpu, "invaders");
+		emulator.loadGame(cpu, "test.com");
 		
 		// Screen upscale factor
 		int displayScale = 3;
-		
+		//TODO: DELETE
+		cpu.memory[0]=0xc3;    
+		cpu.memory[1]=0;    
+	    cpu.memory[2]=0x01;
+		cpu.memory[368] = 0x7;
+		cpu.memory[0x59c] = 0xc3; //JMP    
+		cpu.memory[0x59d] = 0xc2;    
+		cpu.memory[0x59e] = 0x05;
 		Screen screen = new Screen(cpu, displayScale);
 		Frame f = new Frame(screen);
 		while(true) {

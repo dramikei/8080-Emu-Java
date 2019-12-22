@@ -57,13 +57,13 @@ public class Emulation {
 	
 	
 	void GenerateInterrupt(CPU cpu, int interrupt_num) {
-		System.out.println("Pushing to Stack(interrupt): 0x"+String.format("%x", cpu.pc));
+		System.out.println("Pushing to Stack(interrupt): 0x"+String.format("%04x", cpu.pc));
 		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) (((cpu.pc-1) >> 8) & 0xff);
 		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) ((cpu.pc-1) & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;
 		
 		cpu.pc = 8*interrupt_num;
-		System.out.println("PC is at: 0x"+String.format("%x", cpu.pc));
+		System.out.println("PC is at: 0x"+String.format("%04x", cpu.pc));
 		cpu.interrupt_enable = false;
 	}
 	
@@ -72,7 +72,8 @@ public class Emulation {
 		try {
 			DataInputStream data = new DataInputStream(new FileInputStream(file));
 			int fileSize = (int) file.length();
-			for(int i=0;i<fileSize;i++) {
+			//TODO: FIX
+			for(int i=0x100;i<fileSize;i++) {
 				cpu.memory[i] = (short) data.read();
 			}
 			data.close();
@@ -1073,6 +1074,7 @@ public class Emulation {
 				set_cc_parity(ans,cpu);
 				break;
 			}
+			
 
 			case 0xa4: { //ANA H
 				short ans = (short) ((cpu.a&cpu.h)&0xff);
@@ -1428,6 +1430,7 @@ public class Emulation {
 			}
 			
 			case 0xcc: { //CZ addr
+				//TODO: Fix
 				if (cpu.cc.z != 0) {
 					call(cpu);
 				} else {
@@ -1437,7 +1440,24 @@ public class Emulation {
 			}
 			
 			case 0xcd: { //CALL addr
-				call(cpu);
+				if (5 ==  ((cpu.memory[cpu.pc+2] << 8) | cpu.memory[cpu.pc+1]))    
+	            {    
+	                if (cpu.c == 9)    
+	                {    
+	                        
+	                }    
+	                else if (cpu.c == 2)    
+	                {    
+	                	
+	                }    
+	            }    
+	            else if (0 ==  ((cpu.memory[cpu.pc+2] << 8) | cpu.memory[cpu.pc+1]))    
+	            {    
+	                System.exit(0);    
+	            }
+	            else {
+	            	call(cpu);
+	            }
 				break;
 			}
 			
@@ -1716,7 +1736,7 @@ public class Emulation {
 	
 	void call(CPU cpu) {
 		int ret = (cpu.pc +2)&0xffff;
-		System.out.println("Pushing to Stack(call): 0x"+String.format("%x", ret));
+		System.out.println("Pushing to Stack(call): 0x"+String.format("%04x", ret+1));
 		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
 		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;

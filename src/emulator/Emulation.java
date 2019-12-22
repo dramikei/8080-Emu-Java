@@ -605,7 +605,32 @@ public class Emulation {
 				cpu.d = cpu.b;
 				break;
 			}
-
+			
+			case 0x51: { //MOV D,C
+				cpu.d = cpu.c;
+				break;
+			}
+			
+			case 0x52: { //MOV D,D
+				cpu.d = cpu.d;
+				break;
+			}
+			
+			case 0x53: { //MOV D,E
+				cpu.d = cpu.e;
+				break;
+			}
+			
+			case 0x54: { //MOV D,H
+				cpu.d = cpu.h;
+				break;
+			}
+			
+			case 0x55: { //MOV D,L
+				cpu.d = cpu.l;
+				break;
+			}
+			
 			case 0x56: { //MOV D,M
 				int addr = ((cpu.h << 8) | (cpu.l)) & 0xffff;
 				cpu.d = cpu.memory[addr];
@@ -614,6 +639,36 @@ public class Emulation {
 			
 			case 0x57: { //MOV D,A
 				cpu.d = cpu.a;
+				break;
+			}
+			
+			case 0x58: { //MOV E,B
+				cpu.e = cpu.b;
+				break;
+			}
+			
+			case 0x59: { //MOV E,C
+				cpu.e = cpu.c;
+				break;
+			}
+			
+			case 0x5a: { //MOV E,D
+				cpu.e = cpu.d;
+				break;
+			}
+			
+			case 0x5b: { //MOV E,E
+				cpu.e = cpu.e;
+				break;
+			}
+			
+			case 0x5c: { //MOV E,H
+				cpu.e = cpu.h;
+				break;
+			}
+			
+			case 0x5d: { //MOV E,L
+				cpu.e = cpu.l;
 				break;
 			}
 			
@@ -1354,7 +1409,7 @@ public class Emulation {
 			}
 			
 			case 0xc0: { //RNZ
-				if (cpu.cc.z != 0) {
+				if (cpu.cc.z == 0) {
 					ret(cpu);
 				}
 				break;
@@ -1398,12 +1453,11 @@ public class Emulation {
 			}
 			
 			case 0xc6: { //ADI Byte
-				int ans = ((cpu.a + cpu.memory[(cpu.pc + 1) & 0xffff]));
+				int ans = ((cpu.a + cpu.memory[(cpu.pc + 1) & 0xffff])&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
-//				System.out.println(cpu.cc.cy + " " +cpu.cc.p + " " +cpu.cc.s + " "+ cpu.cc.z);
 				cpu.a = (short) (ans & 0xff);
 				cpu.pc = (short) ((cpu.pc + 1)&0xffff);
 				break;
@@ -1573,6 +1627,13 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xe0: { //RPO
+				if(cpu.cc.p == 0) {
+					ret(cpu);
+				}
+				break;
+			}
+			
 			case 0xe1: { //POP H
 				cpu.l = (short)(cpu.memory[cpu.sp]&0xff);
 				cpu.h = (short)(cpu.memory[(cpu.sp+1)&0xffff]&0xff);
@@ -1626,6 +1687,13 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xe8: { //RPE
+				if(cpu.cc.p !=0) {
+					ret(cpu);
+				}
+				break;
+			}
+			
 			case 0xe9: { //PCHL
 				int addr = (((cpu.h&0xff) << 8) | (cpu.l))&0xffff;
 				System.out.println(addr);
@@ -1653,6 +1721,15 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xec: { //CPE addr
+				if(cpu.cc.p != 0) {
+					call(cpu);
+				} else {
+					cpu.pc = (cpu.pc + 2)&0xffff;
+				}
+				break;
+			}
+			
 			case 0xee: { //XRI D8
 				short x = (short)((cpu.a ^ cpu.memory[(cpu.pc+1)&0xffff])&0xff);
 				set_cc_zero(x,cpu);
@@ -1672,6 +1749,13 @@ public class Emulation {
 //				cpu.pc = 0x20;
 //				break;
 //			}
+			
+			case 0xf0: { //RP
+				if(cpu.cc.s == 0) {
+					ret(cpu);
+				}
+				break;
+			}
 			
 			case 0xf1: { //POP PSW
 				cpu.a = cpu.memory[(cpu.sp+1)&0xffff];
@@ -1696,6 +1780,15 @@ public class Emulation {
 			
 			case 0xf3: { //DI
 				cpu.interrupt_enable = false;
+				break;
+			}
+			
+			case 0xf4: { //CP addr
+				if(cpu.cc.s == 0) {
+					call(cpu);
+				} else {
+					cpu.pc = (cpu.pc + 2)&0xffff;
+				}
 				break;
 			}
 			

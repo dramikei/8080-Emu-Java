@@ -1553,7 +1553,25 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xdc: { //CC adr
+				if (cpu.cc.cy !=0) {
+					call(cpu);
+				} else {
+					cpu.pc = (cpu.pc+2)&0xffff;
+				}
+				break;
+			}
 			
+			case 0xde: { //SBI D8
+				int x = (cpu.a - cpu.memory[cpu.pc+1] - cpu.cc.cy)&0xffff;
+				set_cc_zero(x&0xff,cpu);
+				set_cc_sign(x&0xff,cpu);
+				set_cc_parity(x&0xff,cpu);
+				cpu.cc.cy = (short)((x > 0xff) ? 1:0);
+				cpu.a = (short)(x&0xff);
+				cpu.pc = (cpu.pc+1)&0xffff;
+				break;
+			}
 			
 			case 0xe1: { //POP H
 				cpu.l = (short)(cpu.memory[cpu.sp]&0xff);
@@ -1632,6 +1650,17 @@ public class Emulation {
 				cpu.e = cpu.l;
 				cpu.h = temp1;
 				cpu.l = temp2;
+				break;
+			}
+			
+			case 0xee: { //XRI D8
+				short x = (short)((cpu.a ^ cpu.memory[(cpu.pc+1)&0xffff])&0xff);
+				set_cc_zero(x,cpu);
+				set_cc_sign(x,cpu);
+				set_cc_parity(x,cpu);
+				cpu.cc.cy = 0;
+				cpu.a = x;
+				cpu.pc = (cpu.pc + 1)&0xffff;
 				break;
 			}
 			
@@ -1714,9 +1743,18 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xfc: { //CM addr
+				if(cpu.cc.s != 0) {
+					call(cpu);
+				} else {
+					cpu.pc = (cpu.pc+2)&0xffff;
+				}
+				break;
+			}
+			
 			case 0xfe: { //CPI d8
-				int x = (cpu.a - cpu.memory[(cpu.pc +1)&0xffff]);
-				cpu.cc.z = (short)((x==0)?1:0);
+				short x = (short)(cpu.a - cpu.memory[(cpu.pc +1)&0xffff]);
+				set_cc_zero(x,cpu);
 				cpu.cc.s = (short)((0x80 == (x & 0x80))?1:0);
 				set_cc_parity(x,cpu);
 				cpu.cc.cy = (short)((cpu.a < cpu.memory[cpu.pc+1])?1:0);

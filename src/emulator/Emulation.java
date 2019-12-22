@@ -1230,8 +1230,8 @@ public class Emulation {
 			}
 
 			case 0xb3: { //ORA E
-				short ans = (short) ((cpu.a|cpu.e)&0xff);
-				cpu.a = ans;
+				int ans = ((cpu.a|cpu.e));
+				cpu.a = (short)(ans&0xff);
 				set_cc_carry(ans,cpu);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1240,8 +1240,8 @@ public class Emulation {
 			}
 
 			case 0xb4: { //ORA H
-				short ans = (short) ((cpu.a|cpu.h)&0xff);
-				cpu.a = ans;
+				int ans = ((cpu.a|cpu.h));
+				cpu.a = (short)(ans&0xff);
 				set_cc_carry(ans,cpu);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1250,8 +1250,8 @@ public class Emulation {
 			}
 
 			case 0xb5: { //ORA L
-				short ans = (short) ((cpu.a|cpu.l)&0xff);
-				cpu.a = ans;
+				int ans = ((cpu.a|cpu.l));
+				cpu.a = (short)(ans&0xff);
 				set_cc_carry(ans,cpu);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1261,8 +1261,8 @@ public class Emulation {
 
 			case 0xb6: { //ORA M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
-				short ans = (short) ((cpu.a|cpu.memory[offset&0xffff])&0xff);
-				cpu.a = ans;
+				int ans = ((cpu.a|cpu.memory[offset&0xffff]));
+				cpu.a = (short)(ans&0xff);
 				set_cc_carry(ans,cpu);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1398,11 +1398,12 @@ public class Emulation {
 			}
 			
 			case 0xc6: { //ADI Byte
-				short ans = (short) ((cpu.a + cpu.memory[(cpu.pc + 1) & 0xffff])&0xff);
+				int ans = ((cpu.a + cpu.memory[(cpu.pc + 1) & 0xffff]));
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
+//				System.out.println(cpu.cc.cy + " " +cpu.cc.p + " " +cpu.cc.s + " "+ cpu.cc.z);
 				cpu.a = (short) (ans & 0xff);
 				cpu.pc = (short) ((cpu.pc + 1)&0xffff);
 				break;
@@ -1463,7 +1464,7 @@ public class Emulation {
 			
 			case 0xce: { //ACI D8
 				short data = (short)cpu.memory[(cpu.pc+1)&0xffff];
-				short ans = (short) ((cpu.a + data + cpu.cc.cy)&0xff);
+				int ans = ((cpu.a + data + cpu.cc.cy));
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
@@ -1519,12 +1520,13 @@ public class Emulation {
 			}
 			
 			case 0xd6: { //SUI D8
-				short ans = (short)(cpu.a - (cpu.memory[(cpu.pc+1)&0xffff]&0xff));
+				short ans = (short)(cpu.a - (cpu.memory[(cpu.pc+1)&0xffff])&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
-				set_cc_carry(ans,cpu);
+				cpu.cc.cy = (short) ((cpu.a < cpu.memory[cpu.pc+1]) ? 1:0);
 				set_cc_parity(ans,cpu);
-				cpu.a = ans;
+				cpu.a = (short)(ans&0xff);
+				cpu.pc = ((cpu.pc + 1) & 0xffff);
 				break;
 			}
 			
@@ -1536,7 +1538,7 @@ public class Emulation {
 			}
 			
 			case 0xda: { //JC adr
-				if (cpu.cc.cy ==1) {
+				if (cpu.cc.cy != 0) {
 					jump_to_addr(cpu);
 				} else {
 					cpu.pc = (cpu.pc+2)&0xffff;
@@ -1551,6 +1553,8 @@ public class Emulation {
 				break;
 			}
 			
+			
+			
 			case 0xe1: { //POP H
 				cpu.l = (short)(cpu.memory[cpu.sp]&0xff);
 				cpu.h = (short)(cpu.memory[(cpu.sp+1)&0xffff]&0xff);
@@ -1561,6 +1565,8 @@ public class Emulation {
 			case 0xe2: { //JPO addr
 				if (cpu.cc.p == 0) {
 					jump_to_addr(cpu);
+				} else {
+					cpu.pc = (cpu.pc + 2)&0xffff;
 				}
 				break;
 			}
@@ -1592,12 +1598,12 @@ public class Emulation {
 			}
 			
 			case 0xe6: { //ANI Byte
-				short ans = (short) ((cpu.a &0xff)& cpu.memory[(cpu.pc+1)&0xffff]);
+				int ans = ((cpu.a &0xff)& cpu.memory[(cpu.pc+1)&0xffff]);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
 				set_cc_carry(ans,cpu);
-				cpu.a = ans;
+				cpu.a = (short)(ans&0xff);
 				cpu.pc = (cpu.pc + 1)&0xffff;
 				break;
 			}
@@ -1607,6 +1613,15 @@ public class Emulation {
 				System.out.println(addr);
 				cpu.pc = addr;
 				cpu.pc = (cpu.pc - 1)&0xffff; //PC will be incremented at the end.
+				break;
+			}
+			
+			case 0xea: { //JPE adr
+				if(cpu.cc.p != 0) {
+					jump_to_addr(cpu);
+				} else {
+					cpu.pc = (cpu.pc + 2)&0xffff;
+				}
 				break;
 			}
 			
@@ -1641,6 +1656,15 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xf2: { //JP adr
+				if(cpu.cc.s == 0) {
+					jump_to_addr(cpu);
+				} else {
+					cpu.pc = (cpu.pc + 2)&0xffff;
+				}
+				break;
+			}
+			
 			case 0xf3: { //DI
 				cpu.interrupt_enable = false;
 				break;
@@ -1659,12 +1683,12 @@ public class Emulation {
 			}
 			
 			case 0xf6: { //ORI D8
-				short ans = (short)((cpu.a | cpu.memory[(cpu.pc+1)&0xffff])&0xff);
+				int ans = (cpu.a | cpu.memory[(cpu.pc+1)&0xffff]);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.cc.cy = 0;
-				cpu.a = ans;
+				cpu.a = (short)(ans&0xff);
 				cpu.pc = (cpu.pc+1)&0xffff;
 				break;
 			}
@@ -1676,6 +1700,14 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xfa: { //JM addr
+				if(cpu.cc.s != 0) {
+					jump_to_addr(cpu);
+				} else {
+					cpu.pc = (cpu.pc+2)&0xffff;
+				}
+				break;
+			}
 			
 			case 0xfb: { //EI
 				cpu.interrupt_enable = true;
@@ -1683,7 +1715,7 @@ public class Emulation {
 			}
 			
 			case 0xfe: { //CPI d8
-				short x = (short)((cpu.a - cpu.memory[(cpu.pc +1)&0xffff])&0xff);
+				int x = (cpu.a - cpu.memory[(cpu.pc +1)&0xffff]);
 				cpu.cc.z = (short)((x==0)?1:0);
 				cpu.cc.s = (short)((0x80 == (x & 0x80))?1:0);
 				set_cc_parity(x,cpu);
@@ -1698,19 +1730,19 @@ public class Emulation {
 		return cycles8080[opcode];
 	}
 	
-	void set_cc_zero(short ans, CPU cpu ) {
+	void set_cc_zero(int ans, CPU cpu ) {
 		cpu.cc.z = (short) (((ans & 0xff) == 0) ? 1 : 0);
 	}
-	void set_cc_sign(short ans, CPU cpu) {
+	void set_cc_sign(int ans, CPU cpu) {
 		cpu.cc.s = (short) (((ans & 0x80) != 0) ? 1 : 0);
 	}
-	void set_cc_carry(short ans, CPU cpu) {
+	void set_cc_carry(int ans, CPU cpu) {
 		cpu.cc.cy = (short) ((ans > 0xff) ? 1:0);
 	}
 	void set_cc_carry_pair(int ans, CPU cpu) {
 		cpu.cc.cy = (short) ((ans > 0xffff) ? 1:0);
 	}
-	void set_cc_parity(short ans, CPU cpu) {
+	void set_cc_parity(int ans, CPU cpu) {
 		String byt = Integer.toBinaryString(ans&0xff);
 		int count = 0;
 		for(int i = 0; i<byt.length(); i++) {

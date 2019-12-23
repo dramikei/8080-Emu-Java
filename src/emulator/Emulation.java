@@ -293,6 +293,12 @@ public class Emulation {
 				break;
 			}
 			
+			case 0x1e: { //MVI E,D8
+				cpu.e = (short)(cpu.memory[(cpu.pc+1)&0xffff]&0xff);
+				cpu.pc = (cpu.pc+1)&0xffff;
+				break;
+			}
+			
 			case 0x1f: { //RAR
 				short ans = (short)(cpu.a&0xff);
 				cpu.a = (short)(((cpu.cc.cy << 7) | (ans >> 1))&0xff);
@@ -509,7 +515,7 @@ public class Emulation {
 			}
 
 			case 0x3e: { //MVI A,D8
-				cpu.a = (short) (cpu.memory[cpu.pc + 1]&0xff);
+				cpu.a = (short) (cpu.memory[(cpu.pc + 1)&0xffff]&0xff);
 				cpu.pc = (cpu.pc+1)&0xffff;
 				break;
 			}
@@ -854,7 +860,7 @@ public class Emulation {
 			}
 			
 			case 0x80: { //ADD B
-				short ans = (short) ((cpu.a + cpu.b)&0xff);
+				int ans = ((cpu.a + cpu.b)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
@@ -864,7 +870,7 @@ public class Emulation {
 			}
 			
 			case 0x81: { //ADD C
-				short ans = (short) ((cpu.a + cpu.c)&0xff);
+				int ans = ((cpu.a + cpu.c)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
@@ -874,7 +880,7 @@ public class Emulation {
 			}
 			
 			case 0x82: { //ADD D
-				short ans = (short) ((cpu.a + cpu.d)&0xff);
+				int ans = ((cpu.a + cpu.d)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
@@ -884,7 +890,7 @@ public class Emulation {
 			}
 			
 			case 0x83: { //ADD E
-				short ans = (short) ((cpu.a + cpu.e)&0xff);
+				int ans = ((cpu.a + cpu.e)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
@@ -894,7 +900,7 @@ public class Emulation {
 			}
 			
 			case 0x84: { //ADD H
-				short ans = (short) ((cpu.a + cpu.h)&0xff);
+				int ans = ((cpu.a + cpu.h)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
@@ -904,7 +910,7 @@ public class Emulation {
 			}
 			
 			case 0x85: { //ADD L
-				short ans = (short) ((cpu.a + cpu.l)&0xff);
+				int ans = ((cpu.a + cpu.l)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
@@ -915,7 +921,7 @@ public class Emulation {
 			
 			case 0x86: { //ADD M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
-				short ans = (short) ((cpu.a + cpu.memory[(offset)])&0xff);
+				int ans = ((cpu.a + cpu.memory[(offset)])&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
@@ -925,7 +931,17 @@ public class Emulation {
 			}
 			
 			case 0x87: { //ADD A
-				short ans = (short) ((cpu.a + cpu.a)&0xff);
+				int ans = ((cpu.a + cpu.a)&0xffff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				cpu.a = (short)(ans&0xff);
+				break;
+			}
+			
+			case 0x88: { //ADC B
+				int ans = ((cpu.a + cpu.b + cpu.cc.cy)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
@@ -934,79 +950,77 @@ public class Emulation {
 				break;
 			}
 			
-			case 0x88: { //ADC B
-				short ans = (short) ((cpu.a + cpu.b + cpu.cc.cy)&0xff);
-				set_cc_zero(ans,cpu);
-				set_cc_sign(ans,cpu);
-				set_cc_carry(ans,cpu);
-				set_cc_parity(ans,cpu);
-				cpu.a = (short) (ans & 0xff);
-			}
-			
 			case 0x89: { //ADC C
-				short ans = (short) ((cpu.a + cpu.c + cpu.cc.cy)&0xff);
+				int ans = ((cpu.a + cpu.c + cpu.cc.cy)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
 			}
 			
 			
 			case 0x8a: { //ADC D
-				short ans = (short) ((cpu.a + cpu.d + cpu.cc.cy)&0xff);
+				int ans = ((cpu.a + cpu.d + cpu.cc.cy)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
 			}
 			
 			
 			case 0x8b: { //ADC E
-				short ans = (short) ((cpu.a + cpu.e + cpu.cc.cy)&0xff);
+				int ans = ((cpu.a + cpu.e + cpu.cc.cy)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
 			}
 			
 			case 0x8c: { //ADC h
-				short ans = (short) ((cpu.a + cpu.h + cpu.cc.cy)&0xff);
+				int ans = ((cpu.a + cpu.h + cpu.cc.cy)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
 			}
 			
 			case 0x8d: { //ADC L
-				short ans = (short) ((cpu.a + cpu.l + cpu.cc.cy)&0xff);
+				int ans = ((cpu.a + cpu.l + cpu.cc.cy)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
 			}
 			
 			case 0x8e: { //ADC M
 				int offset = ((cpu.h << 8) | (cpu.l)) & 0xffff;
-				short ans = (short) ((cpu.a + cpu.memory[(offset)] + cpu.cc.cy)&0xff);
+				int ans = ((cpu.a + cpu.memory[(offset)] + cpu.cc.cy)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
 			}
 			
 			case 0x8f: { //ADC A
-				short ans = (short) ((cpu.a + cpu.a + cpu.cc.cy)&0xff);
+				int ans = ((cpu.a + cpu.a + cpu.cc.cy)&0xffff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
 				cpu.a = (short) (ans & 0xff);
+				break;
 			}
 			
 			case 0x90: { //SUB B
@@ -1696,7 +1710,6 @@ public class Emulation {
 			
 			case 0xe9: { //PCHL
 				int addr = (((cpu.h&0xff) << 8) | (cpu.l))&0xffff;
-				System.out.println(addr);
 				cpu.pc = addr;
 				cpu.pc = (cpu.pc - 1)&0xffff; //PC will be incremented at the end.
 				break;
@@ -1846,7 +1859,10 @@ public class Emulation {
 			}
 			
 			case 0xfe: { //CPI d8
-				short x = (short)(cpu.a - cpu.memory[(cpu.pc +1)&0xffff]);
+				short x = (short)((cpu.a - cpu.memory[(cpu.pc +1)&0xffff])&0xff);
+//				System.out.println(String.format("%04x", cpu.a));
+//				System.out.println(String.format("%04x", cpu.memory[(cpu.pc +1)&0xffff]));
+//				System.out.println(x);
 				set_cc_zero(x,cpu);
 				cpu.cc.s = (short)((0x80 == (x & 0x80))?1:0);
 				set_cc_parity(x,cpu);

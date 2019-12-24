@@ -73,7 +73,6 @@ public class Emulation {
 			DataInputStream data = new DataInputStream(new FileInputStream(file));
 			int fileSize = (int) file.length();
 			//TODO: FIX
-			System.out.println(fileSize);
 			for(int i=0x00;i<fileSize;i++) {
 				cpu.memory[i] = (short) data.read();
 			}
@@ -91,10 +90,12 @@ public class Emulation {
 			System.out.println("CPU ERROR!");
 			System.exit(2);
 		}
+		if(cpu.pc == 0x069f) {
+			System.out.println("ALL CPU TESTS PASSED! (except DAA)");
+			System.out.println("CPU OK!");
+			System.exit(0);
+		}
 		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode)+" "+String.format("%02x", cpu.sp)+" "+String.format("%02x", cpu.memory[cpu.sp]));
-//		System.out.println(cpu.h);
-//		System.out.println(cpu.l);
-//		System.out.println(cpu.memory[1723] + " " + cpu.memory[1724]);
 		System.out.println("");
 		switch(opcode) {
 			case 0x00: { break; } //NOP
@@ -167,9 +168,6 @@ public class Emulation {
 			
 			case 0x0a: { //LDAX B
 				int offset = (((cpu.b&0xff)<<8) | (cpu.c&0xff))&0xffff;
-				System.out.println(cpu.b);
-				System.out.println(cpu.c);
-				System.out.println(offset);
 				cpu.a = cpu.memory[offset];
 				break;
 			}
@@ -401,7 +399,6 @@ public class Emulation {
 			
 			case 0x2a: { //LHLD addr
 				int offset = (((cpu.memory[cpu.pc+2]&0xff) << 8) | (cpu.memory[cpu.pc+1]&0xff))&0xffff;
-				System.out.println(offset);
 				cpu.l = cpu.memory[offset];
 				cpu.h = cpu.memory[(offset+1)&0xffff];
 				cpu.pc = ((cpu.pc + 2) & 0xffff);
@@ -445,7 +442,6 @@ public class Emulation {
 			}
 			
 			case 0x31: { //LXI SP
-				System.out.println(cpu.pc+2);
 				cpu.sp = ((cpu.memory[((cpu.pc+2) & 0xffff)]&0xff) << 8) | (cpu.memory[((cpu.pc+1) & 0xffff)]&0xff);
 				cpu.pc = ((cpu.pc + 2) & 0xffff);
 				break;
@@ -453,8 +449,6 @@ public class Emulation {
 			
 			case 0x32: { //STA addr
 				int addr = (((cpu.memory[cpu.pc+2]&0xff)<<8) | ((cpu.memory[cpu.pc+1])&0xff))&0xffff;
-				System.out.println(addr);
-				System.out.println(cpu.a);
 				cpu.memory[addr] = cpu.a;
 				cpu.pc = (cpu.pc+2)&0xffff;
 				break;
@@ -1363,9 +1357,7 @@ public class Emulation {
 
 			case 0xaf: { //XRA A
 				short ans = (short) ((cpu.a^cpu.a)&0xff);
-				System.out.println(cpu.a);
 				cpu.a = ans;
-				System.out.println(ans);
 				set_cc_carry(ans,cpu);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1947,6 +1939,11 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xf9: { //SPHL
+				cpu.sp = ((cpu.h << 8) | cpu.l)&0xffff;
+				break;
+			}
+			
 			case 0xfa: { //JM addr
 				if(cpu.cc.s != 0) {
 					jump_to_addr(cpu);
@@ -1972,9 +1969,6 @@ public class Emulation {
 			
 			case 0xfe: { //CPI d8
 				short x = (short)((cpu.a - cpu.memory[(cpu.pc +1)&0xffff])&0xff);
-				System.out.println(String.format("%04x", cpu.a));
-				System.out.println(String.format("%04x", cpu.memory[(cpu.pc +1)&0xffff]));
-				System.out.println(x);
 				set_cc_zero(x,cpu);
 				cpu.cc.s = (short)((0x80 == (x & 0x80))?1:0);
 				set_cc_parity(x,cpu);

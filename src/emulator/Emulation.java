@@ -73,7 +73,8 @@ public class Emulation {
 			DataInputStream data = new DataInputStream(new FileInputStream(file));
 			int fileSize = (int) file.length();
 			//TODO: FIX
-			for(int i=0x100;i<fileSize;i++) {
+			System.out.println(fileSize);
+			for(int i=0x00;i<fileSize;i++) {
 				cpu.memory[i] = (short) data.read();
 			}
 			data.close();
@@ -86,8 +87,14 @@ public class Emulation {
 	
 	int Emulate8080(CPU cpu) {
 		short opcode = cpu.memory[cpu.pc];
-		
+		if(cpu.pc == 0x068d) {
+			System.out.println("CPU ERROR!");
+			System.exit(2);
+		}
 		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode)+" "+String.format("%02x", cpu.sp)+" "+String.format("%02x", cpu.memory[cpu.sp]));
+		System.out.println(cpu.h);
+		System.out.println(cpu.l);
+		System.out.println(cpu.memory[1723] + " " + cpu.memory[1724]);
 		System.out.println("");
 		switch(opcode) {
 			case 0x00: { break; } //NOP
@@ -159,7 +166,11 @@ public class Emulation {
 			}
 			
 			case 0x0a: { //LDAX B
-				cpu.a = cpu.memory[((cpu.b << 8) | (cpu.c))&0xffff];
+				int offset = (((cpu.b&0xff)<<8) | (cpu.c&0xff))&0xffff;
+				System.out.println(cpu.b);
+				System.out.println(cpu.c);
+				System.out.println(offset);
+				cpu.a = cpu.memory[offset];
 				break;
 			}
 			
@@ -315,7 +326,7 @@ public class Emulation {
 			}
 			
 			case 0x22: { //SHLD addr
-				int offset = ((cpu.memory[(cpu.pc+1)&0xffff]&0xff)<<8) | (cpu.memory[cpu.pc&0xffff]&0xff);
+				int offset = ((cpu.memory[(cpu.pc+2)&0xffff]&0xff)<<8) | (cpu.memory[(cpu.pc+1)&0xffff]&0xff);
 				cpu.memory[offset] = cpu.l;
 				cpu.memory[(offset+1)&0xffff] = cpu.h;
 				cpu.pc = ((cpu.pc + 2) & 0xffff);
@@ -382,7 +393,8 @@ public class Emulation {
 			}
 			
 			case 0x2a: { //LHLD addr
-				int offset = ((cpu.memory[cpu.pc+2] << 8) | cpu.memory[cpu.pc+1])&0xffff;
+				int offset = (((cpu.memory[cpu.pc+2]&0xff) << 8) | (cpu.memory[cpu.pc+1]&0xff))&0xffff;
+				System.out.println(offset);
 				cpu.l = cpu.memory[offset];
 				cpu.h = cpu.memory[(offset+1)&0xffff];
 				cpu.pc = ((cpu.pc + 2) & 0xffff);
@@ -426,13 +438,16 @@ public class Emulation {
 			}
 			
 			case 0x31: { //LXI SP
+				System.out.println(cpu.pc+2);
 				cpu.sp = ((cpu.memory[((cpu.pc+2) & 0xffff)]&0xff) << 8) | (cpu.memory[((cpu.pc+1) & 0xffff)]&0xff);
 				cpu.pc = ((cpu.pc + 2) & 0xffff);
 				break;
 			}
 			
 			case 0x32: { //STA addr
-				int addr = (((cpu.memory[cpu.pc+2]&0xff)<<8) | (cpu.memory[cpu.pc+1])&0xff)&0xffff;
+				int addr = (((cpu.memory[cpu.pc+2]&0xff)<<8) | ((cpu.memory[cpu.pc+1])&0xff))&0xffff;
+				System.out.println(addr);
+				System.out.println(cpu.a);
 				cpu.memory[addr] = cpu.a;
 				cpu.pc = (cpu.pc+2)&0xffff;
 				break;
@@ -1024,7 +1039,7 @@ public class Emulation {
 			}
 			
 			case 0x90: { //SUB B
-				short ans = (short)((cpu.a - cpu.b)&0xff);
+				int ans = ((cpu.a - cpu.b)&0xffff);
 				cpu.a = (short)(ans&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1034,7 +1049,7 @@ public class Emulation {
 			}
 			
 			case 0x91: { //SUB C
-				short ans = (short)((cpu.a - cpu.c)&0xff);
+				int ans = ((cpu.a - cpu.c)&0xffff);
 				cpu.a = (short)(ans&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1044,7 +1059,7 @@ public class Emulation {
 			}
 			
 			case 0x92: { //SUB D
-				short ans = (short)((cpu.a - cpu.d)&0xff);
+				int ans = ((cpu.a - cpu.d)&0xffff);
 				cpu.a = (short)(ans&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1054,7 +1069,7 @@ public class Emulation {
 			}
 			
 			case 0x93: { //SUB E
-				short ans = (short)((cpu.a - cpu.e)&0xff);
+				int ans = ((cpu.a - cpu.e)&0xffff);
 				cpu.a = (short)(ans&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1064,7 +1079,7 @@ public class Emulation {
 			}
 			
 			case 0x94: { //SUB H
-				short ans = (short)((cpu.a - cpu.h)&0xff);
+				int ans = ((cpu.a - cpu.h)&0xffff);
 				cpu.a = (short)(ans&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1074,7 +1089,7 @@ public class Emulation {
 			}
 			
 			case 0x95: { //SUB L
-				short ans = (short)((cpu.a - cpu.l)&0xff);
+				int ans = ((cpu.a - cpu.l)&0xffff);
 				cpu.a = (short)(ans&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1085,7 +1100,7 @@ public class Emulation {
 			
 			case 0x96: { //SUB M
 				int offset = ((cpu.h << 8) | (cpu.l))&0xffff;
-				short ans = (short)((cpu.a - cpu.memory[(offset)])&0xff);
+				int ans = ((cpu.a - cpu.memory[(offset)])&0xffff);
 				cpu.a = (short)(ans&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1095,7 +1110,89 @@ public class Emulation {
 			}
 			
 			case 0x97: { //SUB A
-				short ans = (short)((cpu.a - cpu.a)&0xff);
+				int ans = ((cpu.a - cpu.a)&0xffff);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x98: { //SBB B
+				int ans = ((cpu.a - cpu.b - cpu.cc.cy)&0xffff);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x99: { //SBB C
+				int ans = ((cpu.a - cpu.c - cpu.cc.cy)&0xffff);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x9a: { //SBB D
+				int ans = ((cpu.a - cpu.d - cpu.cc.cy)&0xffff);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			
+			case 0x9b: { //SBB E
+				int ans = ((cpu.a - cpu.e - cpu.cc.cy)&0xffff);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x9c: { //SBB H
+				int ans = ((cpu.a - cpu.h - cpu.cc.cy)&0xffff);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x9d: { //SBB L
+				int ans = ((cpu.a - cpu.l - cpu.cc.cy)&0xffff);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x9e: { //SBB M
+				int offset = ((cpu.h << 8) | (cpu.l))&0xffff;
+				int ans = ((cpu.a - cpu.memory[offset] - cpu.cc.cy)&0xffff);
+				cpu.a = (short)(ans&0xff);
+				set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_carry(ans,cpu);
+				set_cc_parity(ans,cpu);
+				break;
+			}
+			
+			case 0x9f: { //SBB A
+				int ans = ((cpu.a - cpu.a - cpu.cc.cy)&0xffff);
 				cpu.a = (short)(ans&0xff);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1259,7 +1356,9 @@ public class Emulation {
 
 			case 0xaf: { //XRA A
 				short ans = (short) ((cpu.a^cpu.a)&0xff);
+				System.out.println(cpu.a);
 				cpu.a = ans;
+				System.out.println(ans);
 				set_cc_carry(ans,cpu);
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
@@ -1519,6 +1618,7 @@ public class Emulation {
 	                {    
 	                	
 	                }    
+//	                cpu.pc = (cpu.pc+2)&0xffff;
 	            }    
 	            else if (0 ==  ((cpu.memory[cpu.pc+2] << 8) | cpu.memory[cpu.pc+1]))    
 	            {    
@@ -1860,9 +1960,9 @@ public class Emulation {
 			
 			case 0xfe: { //CPI d8
 				short x = (short)((cpu.a - cpu.memory[(cpu.pc +1)&0xffff])&0xff);
-//				System.out.println(String.format("%04x", cpu.a));
-//				System.out.println(String.format("%04x", cpu.memory[(cpu.pc +1)&0xffff]));
-//				System.out.println(x);
+				System.out.println(String.format("%04x", cpu.a));
+				System.out.println(String.format("%04x", cpu.memory[(cpu.pc +1)&0xffff]));
+				System.out.println(x);
 				set_cc_zero(x,cpu);
 				cpu.cc.s = (short)((0x80 == (x & 0x80))?1:0);
 				set_cc_parity(x,cpu);

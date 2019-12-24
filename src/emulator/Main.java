@@ -12,18 +12,22 @@ public class Main {
 		CPU cpu = new CPU();
 		Emulation emulator = new Emulation();
 		in_port1 = 0;
-		emulator.loadGame(cpu, "test.com");
+		emulator.loadGame(cpu, "test.a80.bin");
 		
 		// Screen upscale factor
 		int displayScale = 3;
 		//TODO: DELETE
+		//JMP to 0x100
 		cpu.memory[0]=0xc3;    
 		cpu.memory[1]=0;    
-	    cpu.memory[2]=0x01;
-		cpu.memory[368] = 0x7;
-		cpu.memory[0x59c] = 0xc3; //JMP    
-		cpu.memory[0x59d] = 0xc2;    
-		cpu.memory[0x59e] = 0x05;
+		cpu.memory[2]=0x01;
+		
+		//JMP to Skip DAA tests
+		cpu.memory[0x59d] = 0xc3;
+		cpu.memory[0x59e] = 198;   
+		cpu.memory[0x59f] = 5;    
+//		cpu.memory[0x59e] = 0x05;
+		
 		Screen screen = new Screen(cpu, displayScale);
 		Frame f = new Frame(screen);
 		while(true) {
@@ -53,6 +57,9 @@ public class Main {
 			int cycles_to_catch_up = (int)(2 * sinceLast);
 	        int cycles = 0;
 	        while (cycles_to_catch_up > cycles) {
+	        	if(cpu.pc == 0x59c) {
+	    			cpu.memory[0x59c] = 0xc3;
+	    		}
 	        	cycles += emulator.Emulate8080(cpu);
 	        }
 		}

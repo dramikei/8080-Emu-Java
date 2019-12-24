@@ -92,9 +92,9 @@ public class Emulation {
 			System.exit(2);
 		}
 		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode)+" "+String.format("%02x", cpu.sp)+" "+String.format("%02x", cpu.memory[cpu.sp]));
-		System.out.println(cpu.h);
-		System.out.println(cpu.l);
-		System.out.println(cpu.memory[1723] + " " + cpu.memory[1724]);
+//		System.out.println(cpu.h);
+//		System.out.println(cpu.l);
+//		System.out.println(cpu.memory[1723] + " " + cpu.memory[1724]);
 		System.out.println("");
 		switch(opcode) {
 			case 0x00: { break; } //NOP
@@ -257,6 +257,13 @@ public class Emulation {
 			case 0x16: { //MVI D,Byte
 				cpu.d = (short)(cpu.memory[(cpu.pc+1)&0xffff]&0xff);
 				cpu.pc = (cpu.pc+1)&0xffff;
+				break;
+			}
+			
+			case 0x17: { //RAL
+				short x = cpu.a;
+				cpu.a = (short) (cpu.cc.cy  | (x << 1));
+	            cpu.cc.cy = (short) ((0x80 == (x&0x80)) ? 1:0);
 				break;
 			}
 				
@@ -1873,11 +1880,11 @@ public class Emulation {
 			case 0xf1: { //POP PSW
 				cpu.a = cpu.memory[(cpu.sp+1)&0xffff];
 				short psw = (short) (cpu.memory[cpu.sp&0xffff]&0xff);
-				cpu.cc.z = (short) ((0x01 == (psw & 0x01)) ? 1:0);
-				cpu.cc.s = (short) ((0x02 == (psw & 0x02)) ? 1:0);
-				cpu.cc.p = (short) ((0x04 == (psw & 0x04)) ? 1:0);
-				cpu.cc.cy = (short) ((0x05 == (psw & 0x05)) ? 1:0);
-				cpu.cc.ac = (short) ((0x10 == (psw & 0x10)) ? 1:0);
+				cpu.cc.cy = (short) ((psw & 0x1)); 
+				cpu.cc.p = (short) ((psw&0x4)>>2);
+				cpu.cc.ac = (short) ((psw&0x10)>>4);
+				cpu.cc.z = (short) ((psw&0x40)>>6);
+				cpu.cc.s = (short) ((psw&0x80)>>7);
 				cpu.sp = (cpu.sp +2)&0xffff;
 				break;
 			}
@@ -1907,12 +1914,17 @@ public class Emulation {
 			
 			case 0xf5: { //PUSH PSW
 				cpu.memory[cpu.sp-1] = cpu.a;
-				short psw = (short) ((cpu.cc.z | 
-						cpu.cc.s << 1 | 
-						cpu.cc.p << 2 | 
-						cpu.cc.cy << 3 | 
-						cpu.cc.ac << 4)&0xff);
-				cpu.memory[cpu.sp-2] = psw;
+				short psw = 0;
+				psw |= (cpu.cc.s << 7);
+				psw |= (cpu.cc.z << 6);
+				psw |= 0 << 5;
+				psw |= cpu.cc.ac << 4;
+				psw |= 0 << 3;
+				psw |= (cpu.cc.p << 2);
+				psw |= (1 << 1);
+				psw |= cpu.cc.cy;
+				psw = (short)(psw&0xff);
+				cpu.memory[cpu.sp-2] = (short)(psw&0xff);
 				cpu.sp = (cpu.sp - 2)&0xffff;
 				break;
 			}

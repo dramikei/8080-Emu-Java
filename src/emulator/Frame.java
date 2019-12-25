@@ -4,10 +4,11 @@ import javax.swing.JPanel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Frame extends JFrame implements KeyListener {
+public class Frame extends JFrame implements KeyListener, Runnable {
 	private static final long serialVersionUID = 1L;
-	
-	public Frame(JPanel screen) {
+	CPU cpu;
+	public Frame(CPU cpu, JPanel screen) {
+		this.cpu = cpu;
 		add(screen);
 		setTitle("Space Invaders!");
 		pack();
@@ -70,6 +71,12 @@ public class Frame extends JFrame implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent e) {	
+	}
+
+	@Override
+	public void run() {
+		repaint();
+		
 	}
 
 }

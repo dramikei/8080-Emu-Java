@@ -72,7 +72,6 @@ public class Emulation {
 		try {
 			DataInputStream data = new DataInputStream(new FileInputStream(file));
 			int fileSize = (int) file.length();
-			//TODO: FIX
 			for(int i=0x00;i<fileSize;i++) {
 				cpu.memory[i] = (short) data.read();
 			}
@@ -86,16 +85,16 @@ public class Emulation {
 	
 	int Emulate8080(CPU cpu) {
 		short opcode = cpu.memory[cpu.pc];
-		if(cpu.pc == 0x068d) {
-			System.out.println("CPU ERROR!");
-			System.exit(2);
-		}
-		if(cpu.pc == 0x069f) {
-			System.out.println("ALL CPU TESTS PASSED! (except DAA)");
-			System.out.println("CPU OK!");
-			System.exit(0);
-		}
-		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode)+" "+String.format("%02x", cpu.sp)+" "+String.format("%02x", cpu.memory[cpu.sp]));
+//		if(cpu.pc == 0x068d) {
+//			System.out.println("CPU ERROR!");
+//			System.exit(2);
+//		}
+//		if(cpu.pc == 0x069f) {
+//			System.out.println("ALL CPU TESTS PASSED! (except DAA)");
+//			System.out.println("CPU OK!");
+//			System.exit(0);
+//		}
+		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode));
 		System.out.println("");
 		switch(opcode) {
 			case 0x00: { break; } //NOP
@@ -372,19 +371,19 @@ public class Emulation {
 				break;
 			}
 
-			case 0x27: { //DAA
-				if ((cpu.a &0xf) > 9) {
-					cpu.a = (short)((cpu.a +6)&0xff);
-				}
-				if ((cpu.a&0xf0) > 0x90) {
-					short res = (short)((cpu.a + 0x60)&0xff);
-					cpu.a = res;
-					set_cc_zero(res,cpu);
-					set_cc_sign(res,cpu);
-					set_cc_parity(res,cpu);
-				}
-				break;
-			}
+//			case 0x27: { //DAA
+//				if ((cpu.a &0xf) > 9) {
+//					cpu.a = (short)((cpu.a +6)&0xff);
+//				}
+//				if ((cpu.a&0xf0) > 0x90) {
+//					int res = ((cpu.a + 0x60)&0xffff);
+//					cpu.a = (short)(res&0xff);
+//					set_cc_zero(res,cpu);
+//					set_cc_sign(res,cpu);
+//					set_cc_parity(res,cpu);
+//				}
+//				break;
+//			}
 			
 //			case 0x28: { break; } //NOP
 			
@@ -1575,6 +1574,16 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xc7: { //RST 0
+				int ret = (cpu.pc +2)&0xffff;
+				System.out.println("Pushing to Stack(call): 0x"+String.format("%04x", ret+1));
+				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
+				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
+				cpu.sp = (cpu.sp-2)&0xffff;
+				cpu.pc = 0x0;
+				break;
+			}
+			
 			case 0xc8: {
 				if(cpu.cc.z != 0) {
 					ret(cpu);
@@ -1607,26 +1616,28 @@ public class Emulation {
 			}
 			
 			case 0xcd: { //CALL addr
-				if (5 ==  ((cpu.memory[cpu.pc+2] << 8) | cpu.memory[cpu.pc+1]))    
-	            {    
-	                if (cpu.c == 9)    
-	                {    
-	                        
-	                }    
-	                else if (cpu.c == 2)    
-	                {    
-	                	
-	                }    
-//	                cpu.pc = (cpu.pc+2)&0xffff;
-	            }    
-	            else if (0 ==  ((cpu.memory[cpu.pc+2] << 8) | cpu.memory[cpu.pc+1]))    
-	            {    
-	                System.exit(0);    
-	            }
-	            else {
-	            	call(cpu);
-	            }
+				call(cpu);
 				break;
+//				if (5 ==  ((cpu.memory[cpu.pc+2] << 8) | cpu.memory[cpu.pc+1]))    
+//	            {    
+//	                if (cpu.c == 9)    
+//	                {    
+//	                        
+//	                }    
+//	                else if (cpu.c == 2)    
+//	                {    
+//	                	
+//	                }    
+////	                cpu.pc = (cpu.pc+2)&0xffff;
+//	            }    
+//	            else if (0 ==  ((cpu.memory[cpu.pc+2] << 8) | cpu.memory[cpu.pc+1]))    
+//	            {    
+//	                System.exit(0);    
+//	            }
+//	            else {
+//	            	call(cpu);
+//	            }
+//				break;
 			}
 			
 			case 0xce: { //ACI D8
@@ -1853,14 +1864,13 @@ public class Emulation {
 				break;
 			}
 			
-//			case 0xef: { //RST 5
-			//TODO: Check
-//				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((cpu.pc >> 8) & 0xff);
-//				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (cpu.pc & 0xff);
-//				cpu.sp = (cpu.sp-2)&0xffff;
-//				cpu.pc = 0x20;
-//				break;
-//			}
+			case 0xef: { //RST 5
+				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((cpu.pc >> 8) & 0xff);
+				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (cpu.pc & 0xff);
+				cpu.sp = (cpu.sp-2)&0xffff;
+				cpu.pc = 0x20;
+				break;
+			}
 			
 			case 0xf0: { //RP
 				if(cpu.cc.s == 0) {
@@ -2006,6 +2016,10 @@ public class Emulation {
 		}
 		
 		cpu.cc.p = (short) ((count % 2) == 0 ? 1 : 0);
+	}
+	
+	void set_cc_AC(int ans, CPU cpu) {
+		
 	}
 	
 	void jump_to_addr(CPU cpu) {

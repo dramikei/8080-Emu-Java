@@ -38,10 +38,10 @@ public class Main {
 			//Emulation will be stopped when CPU encounters opcode: 0x76 (HLT)
 			now = Instant.now().toEpochMilli();
 			if(now - cpu.lastTimer >= 16.6667) {
-				
+				Thread obj =new Thread(f);
+				obj.start();
 			}
-			Thread obj =new Thread(f);
-			obj.start();
+			
 			
 			if(cpu.lastTimer == 0.0) {
 				cpu.lastTimer = now;
@@ -66,10 +66,6 @@ public class Main {
 			int cycles_to_catch_up = (int)(2 * sinceLast);
 	        int cycles = 0;
 	        while (cycles_to_catch_up > cycles) {
-//	        	if(cpu.pc == 0x59c) {
-//	    			cpu.memory[0x59c] = 0xc3;
-//	    		}
-
 	        	cycles += emulator.Emulate8080(cpu);
 	        }
 	        cpu.lastTimer = now;

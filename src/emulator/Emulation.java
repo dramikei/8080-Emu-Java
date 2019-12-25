@@ -94,8 +94,8 @@ public class Emulation {
 //			System.out.println("CPU OK!");
 //			System.exit(0);
 //		}
-		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode));
-		System.out.println("");
+//		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode));
+//		System.out.println("");
 		switch(opcode) {
 			case 0x00: { break; } //NOP
 			
@@ -338,11 +338,10 @@ public class Emulation {
 			}
 			
 			case 0x23: { //INX H
-				
-				cpu.l = (short)((cpu.l+1)&0xff);
-				if (cpu.l == 0) {
-					cpu.h = (short)((cpu.h+1)&0xff);
-				}
+				int HL = ((cpu.h << 8) | (cpu.l))&0xffff;
+				HL = (HL+1)&0xffff;
+				cpu.l = (short) (HL&0xff);
+				cpu.h = (short) ((HL>>8)&0xff);
 				break;
 			}
 			

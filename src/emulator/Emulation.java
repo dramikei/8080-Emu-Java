@@ -94,8 +94,8 @@ public class Emulation {
 //			System.out.println("CPU OK!");
 //			System.exit(0);
 //		}
-//		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode));
-//		System.out.println("");
+		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode));
+		System.out.println("");
 		switch(opcode) {
 			case 0x00: { break; } //NOP
 			
@@ -370,19 +370,19 @@ public class Emulation {
 				break;
 			}
 
-//			case 0x27: { //DAA
-//				if ((cpu.a &0xf) > 9) {
-//					cpu.a = (short)((cpu.a +6)&0xff);
-//				}
-//				if ((cpu.a&0xf0) > 0x90) {
-//					int res = ((cpu.a + 0x60)&0xffff);
-//					cpu.a = (short)(res&0xff);
-//					set_cc_zero(res,cpu);
-//					set_cc_sign(res,cpu);
-//					set_cc_parity(res,cpu);
-//				}
-//				break;
-//			}
+			case 0x27: { //DAA
+				if ((cpu.a &0xf) > 9) {
+					cpu.a = (short)((cpu.a +6)&0xff);
+				}
+				if ((cpu.a&0xf0) > 0x90) {
+					int res = ((cpu.a + 0x60)&0xffff);
+					cpu.a = (short)(res&0xff);
+					set_cc_zero(res,cpu);
+					set_cc_sign(res,cpu);
+					set_cc_parity(res,cpu);
+				}
+				break;
+			}
 			
 //			case 0x28: { break; } //NOP
 			

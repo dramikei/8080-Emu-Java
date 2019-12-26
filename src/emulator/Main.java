@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 
 public class Main {
 	static long lastInterrupt = 0;
-	static double now = 0.0;
+//	static double now = 0.0;
 	public static short in_port1;
 	public static void main(String[] args) {
 		CPU cpu = new CPU();
@@ -33,24 +33,24 @@ public class Main {
 		Screen screen = new Screen(cpu, displayScale);
 		Frame f = new Frame(cpu, screen);
 		
-		
+//		now = Instant.now(clock)
+//		int cyclesPerFrame = 2000000 / 60;
+//		int halfCyclesPerFrame = cyclesPerFrame / 2;
 		while(true) {
 			//Emulation will be stopped when CPU encounters opcode: 0x76 (HLT)
-			now = Instant.now().toEpochMilli();
-			if(now - cpu.lastTimer >= 16.6667) {
-				Thread obj =new Thread(f);
-				obj.start();
-			}
 			
-			
+			long now = System.currentTimeMillis();
 			if(cpu.lastTimer == 0.0) {
 				cpu.lastTimer = now;
-				cpu.nextInterrupt = cpu.lastTimer + 16.0;
+				cpu.nextInterrupt = cpu.lastTimer + 16;
 				cpu.whichInterrupt = 1;
 			}
 			
-
-			if ((cpu.interrupt_enable) && (now>cpu.nextInterrupt)) {
+			if(now - cpu.lastTimer> 16) {
+				Thread obj =new Thread(f);
+				obj.start();
+			}
+			if ((cpu.interrupt_enable) && (now > cpu.nextInterrupt)) {
 				if (cpu.whichInterrupt == 1) {
 					emulator.GenerateInterrupt(cpu,1);
 					cpu.whichInterrupt = 2;
@@ -58,17 +58,34 @@ public class Main {
 	            else {
 	            	emulator.GenerateInterrupt(cpu,2);
 	            	cpu.whichInterrupt = 1;
-	            }    
-				cpu.nextInterrupt = now + 8.0;
+	            }
+				cpu.nextInterrupt = now + 8;
 			}
 			
 			double sinceLast = (now - cpu.lastTimer);
 			int cycles_to_catch_up = (int)(2 * sinceLast);
 	        int cycles = 0;
+//	        if (cpu.interrupt_enable) {
+//	        	if (cpu.whichInterrupt == 1) {
+//					emulator.GenerateInterrupt(cpu,1);
+//					cpu.whichInterrupt = 2;
+//	            }
+//	        }
+	        
 	        while (cycles_to_catch_up > cycles) {
 	        	cycles += emulator.Emulate8080(cpu);
 	        }
-	        cpu.lastTimer = now;
+	        
+	        
+//	        if (cpu.interrupt_enable) {
+//	        	if (cpu.whichInterrupt == 2) {
+//					emulator.GenerateInterrupt(cpu,2);
+//					cpu.whichInterrupt = 1;
+//	            }
+//	        }
+	        
+//	        cpu.lastTimer = now;
+	        
 		}
 	}
 }

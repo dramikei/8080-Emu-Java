@@ -72,7 +72,7 @@ public class Emulation {
 		try {
 			DataInputStream data = new DataInputStream(new FileInputStream(file));
 			int fileSize = (int) file.length();
-			for(int i=0x100;i<fileSize;i++) {
+			for(int i=0x0;i<fileSize;i++) {
 				cpu.memory[i] = (short) data.read();
 			}
 			data.close();
@@ -1605,8 +1605,8 @@ public class Emulation {
 			}
 			
 			case 0xcd: { //CALL addr
-				call(cpu);
-//				TEST_DIAG(cpu); // CP/M IMPLEMENTATION FOR CPU TESTS. (Comment call(cpu) to use this)
+//				call(cpu);
+				TEST_DIAG(cpu); // CP/M IMPLEMENTATION FOR CPU TESTS. (Comment call(cpu) to use this)
 				break;
 			}
 			
@@ -2049,6 +2049,7 @@ public class Emulation {
 			cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 			cpu.sp = (cpu.sp - 2) & 0xffff;
 			cpu.pc = (cpu.memory[opcode + 2] << 8) | cpu.memory[opcode + 1];
+			cpu.pc = (cpu.pc-1); //PCwill be incremented at the end of switch
 		}
 	}
 	

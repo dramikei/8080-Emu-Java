@@ -13,23 +13,23 @@ public class Main {
 		CPU cpu = new CPU();
 		Emulation emulator = new Emulation();
 		in_port1 = 0;
-		emulator.loadGame(cpu, "invaders");
+		emulator.loadGame(cpu, "TST8080.COM.exe");
 		
 		// Screen upscale factor
 		int displayScale = 3;
 		
 		
 		//TO BE USED FOR CPU TESTS ONLY
-//		//JMP to 0x100
-//		cpu.memory[0]=0xc3;    
-//		cpu.memory[1]=0;    
-//		cpu.memory[2]=0x01;
-//		
-//		//JMP to Skip DAA tests
+		//JMP to 0x100
+		cpu.memory[0]=0xc3;    
+		cpu.memory[1]=0;    
+		cpu.memory[2]=0x01;
+		
+		//JMP to Skip DAA tests
 //		cpu.memory[0x59d] = 0xc3;
 //		cpu.memory[0x59e] = 198;   
 //		cpu.memory[0x59f] = 5;    
-		
+//		
 		Screen screen = new Screen(cpu, displayScale);
 		Frame f = new Frame(cpu, screen);
 		
@@ -83,7 +83,7 @@ public class Main {
 //					cpu.whichInterrupt = 1;
 //	            }
 //	        }
-	        
+//        
 //	        cpu.lastTimer = now;
 	        
 		}

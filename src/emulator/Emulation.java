@@ -17,7 +17,7 @@ public class Emulation {
 	
 	/*
 	 *  As Java does not support 8 bit or 16 bit "unsigned" integer types,
-	 *  We are using short instead of uint8 and int instead of uint16.
+	 *  We are using short instead of uint8 and int instead of uint16. With strict bitwise and (&) to take care of overflow.
 	 *  
 	 *  Following Data will be used to take care of overflow. 
 	 *  { Overflow: 0xff + 1 == 0x00 if data type is uint8 but is 0x100 if the data type is more than 8 bits }
@@ -72,7 +72,7 @@ public class Emulation {
 		try {
 			DataInputStream data = new DataInputStream(new FileInputStream(file));
 			int fileSize = (int) file.length();
-			for(int i=0x00;i<fileSize;i++) {
+			for(int i=0x100;i<fileSize;i++) {
 				cpu.memory[i] = (short) data.read();
 			}
 			data.close();
@@ -85,15 +85,6 @@ public class Emulation {
 	
 	int Emulate8080(CPU cpu) {
 		short opcode = cpu.memory[cpu.pc];
-//		if(cpu.pc == 0x068d) {
-//			System.out.println("CPU ERROR!");
-//			System.exit(2);
-//		}
-//		if(cpu.pc == 0x069f) {
-//			System.out.println("ALL CPU TESTS PASSED! (except DAA)");
-//			System.out.println("CPU OK!");
-//			System.exit(0);
-//		}
 		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode));
 		System.out.println("");
 		switch(opcode) {
@@ -1605,7 +1596,6 @@ public class Emulation {
 			}
 			
 			case 0xcc: { //CZ addr
-				//TODO: Fix
 				if (cpu.cc.z != 0) {
 					call(cpu);
 				} else {
@@ -1616,27 +1606,8 @@ public class Emulation {
 			
 			case 0xcd: { //CALL addr
 				call(cpu);
+//				TEST_DIAG(cpu); // CP/M IMPLEMENTATION FOR CPU TESTS. (Comment call(cpu) to use this)
 				break;
-//				if (5 ==  ((cpu.memory[cpu.pc+2] << 8) | cpu.memory[cpu.pc+1]))    
-//	            {    
-//	                if (cpu.c == 9)    
-//	                {    
-//	                        
-//	                }    
-//	                else if (cpu.c == 2)    
-//	                {    
-//	                	
-//	                }    
-////	                cpu.pc = (cpu.pc+2)&0xffff;
-//	            }    
-//	            else if (0 ==  ((cpu.memory[cpu.pc+2] << 8) | cpu.memory[cpu.pc+1]))    
-//	            {    
-//	                System.exit(0);    
-//	            }
-//	            else {
-//	            	call(cpu);
-//	            }
-//				break;
 			}
 			
 			case 0xce: { //ACI D8
@@ -2039,6 +2010,46 @@ public class Emulation {
 		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;
 		jump_to_addr(cpu);
+	}
+	
+	void TEST_DIAG(CPU cpu) {
+		
+		// SOURCE: kpmiller — Full 8080 emulation
+		// SOURCE: fireclouu
+		int opcode = cpu.pc;
+		if (5 == ((cpu.memory[opcode + 2] << 8) | cpu.memory[opcode + 1])) {
+
+			if (cpu.c == 9) {
+				int offset = (cpu.d << 8) | (cpu.e);
+				int str = offset + 3;  //skip the prefix bytes
+				char read;
+
+				while ((read = (char)cpu.memory[str]) != '$') {
+					System.out.print(read);
+					str++;
+				}
+				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+				System.out.println();
+			} else if (cpu.c == 2) {
+				System.out.println("print char routine called\n");
+			}
+
+		} else if (0 ==  ((cpu.memory[opcode + 2] << 8) | cpu.memory[opcode + 1])) {
+			// System.exit(0);
+			System.out.println("-- System called for exit --");
+		} else {
+			int  ret = cpu.pc + 2;
+			cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
+			cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
+			cpu.sp = (cpu.sp - 2) & 0xffff;
+			cpu.pc = (cpu.memory[opcode + 2] << 8) | cpu.memory[opcode + 1];
+		}
 	}
 	
 	short in(CPU cpu, short port) {

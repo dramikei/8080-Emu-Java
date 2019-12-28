@@ -71,7 +71,7 @@ public class Emulation {
 	
 	void loadGame(CPU cpu, String name, int starting) {
 		try {
-			InputStream file = new FileInputStream(System.getProperty("user.dir") + "/src/Games/" + name);
+			InputStream file = new FileInputStream(System.getProperty("user.dir") + "/src/roms/" + name);
 			short readFile = 0;
 			int counter = starting;
 			
@@ -160,8 +160,8 @@ public class Emulation {
 			}
 			
 			case 0x0a: { //LDAX B
-//				int offset = (((cpu.b&0xff)<<8) | (cpu.c&0xff))&0xffff;
-//				cpu.a = cpu.memory[offset];
+				int offset = (((cpu.b&0xff)<<8) | (cpu.c&0xff))&0xffff;
+				cpu.a = cpu.memory[offset];
 				break;
 			}
 			
@@ -365,16 +365,30 @@ public class Emulation {
 			}
 
 			case 0x27: { //DAA
-				if ((cpu.a &0xf) > 9) {
-					cpu.a = (short)((cpu.a +6)&0xff);
-				}
-				if ((cpu.a&0xf0) > 0x90) {
-					int res = ((cpu.a + 0x60)&0xffff);
-					cpu.a = (short)(res&0xff);
-					set_cc_zero(res,cpu);
-					set_cc_sign(res,cpu);
-					set_cc_parity(res,cpu);
-				}
+				short correction = 0;
+				short lsb = (short) (cpu.a & 0x0F);
+				short msb = (short) (cpu.a >> 4);
+
+			    if ((cpu.cc.ac ==1) || (lsb > 9)) {
+			        correction += 0x06;
+			    }
+			    if ((cpu.cc.cy ==1) || (msb > 9) || (msb >= 9 && lsb > 9)) {
+			        correction += 0x60;
+			        cpu.cc.cy = 1;
+			    }
+			    int ans = cpu.a + correction;
+			    set_cc_zero(ans,cpu);
+				set_cc_sign(ans,cpu);
+				set_cc_parity(ans,cpu);
+			    int carry = ans ^ cpu.a ^ correction;
+			    if ((carry & (0x100)) == 1) {
+			    	cpu.cc.cy = 1;
+			    }
+			    if ((carry & (0x10)) == 1) {
+			    	cpu.cc.ac = 1;
+			    }
+			    cpu.a = (short) ((cpu.a+correction)&0xff);
+			    
 				break;
 			}
 			
@@ -436,6 +450,7 @@ public class Emulation {
 			case 0x31: { //LXI SP
 				cpu.sp = ((cpu.memory[((cpu.pc+2) & 0xffff)]&0xff) << 8) | (cpu.memory[((cpu.pc+1) & 0xffff)]&0xff);
 				cpu.pc = ((cpu.pc + 2) & 0xffff);
+				
 				break;
 			}
 			
@@ -944,6 +959,7 @@ public class Emulation {
 				set_cc_sign(ans,cpu);
 				set_cc_carry(ans,cpu);
 				set_cc_parity(ans,cpu);
+				set_cc_AC(cpu.a,cpu.a,ans,cpu);
 				cpu.a = (short)(ans&0xff);
 				break;
 			}
@@ -1436,6 +1452,7 @@ public class Emulation {
 				set_cc_zero(ans,cpu);
 				set_cc_sign(ans,cpu);
 				set_cc_parity(ans,cpu);
+				
 				break;
 			}
 			
@@ -1608,8 +1625,8 @@ public class Emulation {
 			}
 			
 			case 0xcd: { //CALL addr
-//				call(cpu);
-				TEST_DIAG(cpu); // CP/M IMPLEMENTATION FOR CPU TESTS. (Comment call(cpu) to use this)
+				call(cpu);
+//				TEST_DIAG(cpu); // CP/M IMPLEMENTATION FOR CPU TESTS. (Comment call(cpu) to use this)
 				break;
 			}
 			
@@ -1952,6 +1969,9 @@ public class Emulation {
 			
 			case 0xfe: { //CPI d8
 				short x = (short)((cpu.a - cpu.memory[(cpu.pc +1)&0xffff])&0xff);
+//				System.out.println(x);
+//				System.out.println(cpu.a);
+//				System.out.println(cpu.memory[(cpu.pc +1)&0xffff]);
 				set_cc_zero(x,cpu);
 				cpu.cc.s = (short)((0x80 == (x & 0x80))?1:0);
 				set_cc_parity(x,cpu);
@@ -1991,8 +2011,8 @@ public class Emulation {
 		cpu.cc.p = (short) ((count % 2) == 0 ? 1 : 0);
 	}
 	
-	void set_cc_AC(int ans, CPU cpu) {
-		
+	void set_cc_AC(int x, int y, int ans, CPU cpu) {
+		cpu.cc.ac = (short) (((x ^ ans ^ y) & 0x10) == 16 ? 1:0);
 	}
 	
 	void jump_to_addr(CPU cpu) {

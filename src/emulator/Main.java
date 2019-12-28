@@ -13,22 +13,22 @@ public class Main {
 		CPU cpu = new CPU();
 		Emulation emulator = new Emulation();
 		in_port1 = 0;
-		emulator.loadGame(cpu, "test.a80.bin", 0x0);
+		emulator.loadGame(cpu, "invaders", 0x0);
 		
 		// Screen upscale factor
 		int displayScale = 3;
 		
 		
-		//TO BE USED FOR CPU TESTS ONLY
+		//TO BE USED FOR CPU TESTS ONLY (CPUDIAG.bin)
 		//JMP to 0x100
-		cpu.memory[0]=0xc3;    
-		cpu.memory[1]=0;    
-		cpu.memory[2]=0x01;
-		
-		//JMP to Skip DAA tests
-//		cpu.memory[0x59d] = 0xc3;
-//		cpu.memory[0x59e] = 198;   
-//		cpu.memory[0x59f] = 5;    
+//		cpu.memory[0]=0xc3;    
+//		cpu.memory[1]=0;    
+//		cpu.memory[2]=0x01;
+//		cpu.memory[368] = 0x7;
+		//JMP to Skip DAA tests (CPUDIAG.bin) 
+//		cpu.memory[0x59c] = 0xc3; //JMP    
+//	    cpu.memory[0x59d] = 0xc2;    
+//	    cpu.memory[0x59e] = 0x05;
 //		
 		Screen screen = new Screen(cpu, displayScale);
 		Frame f = new Frame(cpu, screen);

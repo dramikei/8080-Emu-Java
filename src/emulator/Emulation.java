@@ -1,9 +1,11 @@
 package emulator;
 
 import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class Emulation {
 	
@@ -67,16 +69,17 @@ public class Emulation {
 		cpu.interrupt_enable = false;
 	}
 	
-	void loadGame(CPU cpu, String name) {
-		File file = new File(System.getProperty("user.dir") + "/src/Games/" + name);
+	void loadGame(CPU cpu, String name, int starting) {
 		try {
-			DataInputStream data = new DataInputStream(new FileInputStream(file));
-			int fileSize = (int) file.length();
-			for(int i=0x0;i<fileSize;i++) {
-				cpu.memory[i] = (short) data.read();
+			InputStream file = new FileInputStream(System.getProperty("user.dir") + "/src/Games/" + name);
+			short readFile = 0;
+			int counter = starting;
+			
+			while ((readFile = (short) file.read()) != -1) {
+				cpu.memory[counter] = readFile;
+				counter++;
 			}
-			data.close();
-		} catch(IOException e) {
+		} catch (IOException e) {
 			System.out.println(e);
 		}
 	}
@@ -157,8 +160,8 @@ public class Emulation {
 			}
 			
 			case 0x0a: { //LDAX B
-				int offset = (((cpu.b&0xff)<<8) | (cpu.c&0xff))&0xffff;
-				cpu.a = cpu.memory[offset];
+//				int offset = (((cpu.b&0xff)<<8) | (cpu.c&0xff))&0xffff;
+//				cpu.a = cpu.memory[offset];
 				break;
 			}
 			
@@ -2049,7 +2052,7 @@ public class Emulation {
 			cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 			cpu.sp = (cpu.sp - 2) & 0xffff;
 			cpu.pc = (cpu.memory[opcode + 2] << 8) | cpu.memory[opcode + 1];
-			cpu.pc = (cpu.pc-1); //PCwill be incremented at the end of switch
+			cpu.pc = (cpu.pc-1); //PC will be incremented at the end of switch
 		}
 	}
 	

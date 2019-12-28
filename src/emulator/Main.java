@@ -13,7 +13,7 @@ public class Main {
 		CPU cpu = new CPU();
 		Emulation emulator = new Emulation();
 		in_port1 = 0;
-		emulator.loadGame(cpu, "TST8080.a80.bin");
+		emulator.loadGame(cpu, "test.a80.bin", 0x0);
 		
 		// Screen upscale factor
 		int displayScale = 3;

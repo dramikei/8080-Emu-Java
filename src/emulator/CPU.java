@@ -27,7 +27,7 @@ public class CPU {
 		l = 0;
 		sp = 0x0;
 		pc = 0x0;
-		memory = new short[0xffff];
+		memory = new short[0x10000];
 		lastTimer = 0.0;
 		nextInterrupt = 0.0;
 		whichInterrupt = 0;

@@ -60,8 +60,8 @@ public class Emulation {
 	
 	void GenerateInterrupt(CPU cpu, int interrupt_num) {
 		System.out.println("Pushing to Stack(interrupt): 0x"+String.format("%04x", cpu.pc));
-		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) (((cpu.pc-1) >> 8) & 0xff);
-		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) ((cpu.pc-1) & 0xff);
+		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) (((cpu.pc) >> 8) & 0xff);
+		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) ((cpu.pc) & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;
 		
 		cpu.pc = 8*interrupt_num;
@@ -2022,13 +2022,14 @@ public class Emulation {
 	
 	void ret(CPU cpu) {
 		cpu.pc = ((cpu.memory[(cpu.sp+1)&0xffff]&0xff) << 8) | (cpu.memory[cpu.sp&0xffff]&0xff);
-		System.out.println("Returning to: 0x"+String.format("%x", cpu.pc+1));
+		System.out.println("Returning to: 0x"+String.format("%x", cpu.pc));
 		cpu.sp = (cpu.sp + 2)&0xffff;
+		cpu.pc = (cpu.pc-1)&0xffff; //as pc gets incremented by 1 in the emulation block
 	}
 	
 	void call(CPU cpu) {
-		int ret = (cpu.pc +2)&0xffff;
-		System.out.println("Pushing to Stack(call): 0x"+String.format("%04x", ret+1));
+		int ret = (cpu.pc +3)&0xffff;
+		System.out.println("Pushing to Stack(call): 0x"+String.format("%04x", ret));
 		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
 		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;
@@ -2067,7 +2068,8 @@ public class Emulation {
 			// System.exit(0);
 			System.out.println("-- System called for exit --");
 		} else {
-			int  ret = cpu.pc + 2;
+			int  ret = cpu.pc + 3;
+			System.out.println(String.format("%x", ret));
 			cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
 			cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 			cpu.sp = (cpu.sp - 2) & 0xffff;

@@ -7,13 +7,10 @@ import javax.swing.JFrame;
 
 public class Main {
 	static long lastInterrupt = 0;
-//	static double now = 0.0;
-	public static short in_port1;
 	public static void main(String[] args) {
 		CPU cpu = new CPU();
 		Emulation emulator = new Emulation();
-		in_port1 = 0;
-		emulator.loadGame(cpu, "invaders", 0x0);
+		emulator.loadGame(cpu, "invaders", 0x00);
 		
 		// Screen upscale factor
 		int displayScale = 3;
@@ -24,12 +21,6 @@ public class Main {
 //		cpu.memory[0]=0xc3;    
 //		cpu.memory[1]=0;    
 //		cpu.memory[2]=0x01;
-//		cpu.memory[0x100] = 0xcd;
-//		cpu.memory[0x101] = 23;
-//		cpu.memory[0x102] = 0x1;
-//		cpu.memory[0x117] = 0xc9;
-//		cpu.memory[0x103] = 0x76;
-//		cpu.memory[0x104] = 0x76;
 		
 //		cpu.memory[368] = 0x7;
 		//JMP to Skip DAA tests (CPUDIAG.bin) 
@@ -80,7 +71,10 @@ public class Main {
 //	        }
 	        
 	        while (cycles_to_catch_up > cycles) {
-	        	System.out.println(cycles_to_catch_up);
+	        	if(cpu.memory[cpu.pc] == 0xdb ||cpu.memory[cpu.pc] == 0xd3 ) {
+	        		emulator.Emulate8080(cpu);
+	        		cycles+=3;
+	        	}
 	        	cycles += emulator.Emulate8080(cpu);
 	        }
 	        
@@ -92,7 +86,7 @@ public class Main {
 //	            }
 //	        }
 //        
-	        cpu.lastTimer = now;
+//	        cpu.lastTimer = now;
 	        
 		}
 	}

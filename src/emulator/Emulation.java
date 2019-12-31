@@ -1625,8 +1625,8 @@ public class Emulation {
 			}
 			
 			case 0xcd: { //CALL addr
-				call(cpu);
-//				TEST_DIAG(cpu); // CP/M IMPLEMENTATION FOR CPU TESTS. (Comment call(cpu) to use this)
+//				call(cpu);
+				TEST_DIAG(cpu); // CP/M IMPLEMENTATION FOR CPU TESTS. (Comment call(cpu) to use this)
 				break;
 			}
 			
@@ -1667,6 +1667,26 @@ public class Emulation {
 			
 			case 0xd3: { //OUT d8
 				//TODO: come back here later
+				short port = (short)((cpu.pc+1)&0xffff);
+				short value = cpu.a;
+				
+				switch(port)
+			    {
+			        case 2:
+			            cpu.shift_offset = (short)(value & 0x7);
+			            break;
+			        case 3:
+			        	cpu.out_port3 = value;
+			            break;
+			        case 4:
+			        	cpu.shift0 = cpu.shift1;
+			        	cpu.shift1 = value;
+			            break;
+			        case 5:
+			        	cpu.out_port5 = value;
+			            break;
+			    }
+				
 				cpu.pc = (cpu.pc+1)&0xffff;
 				break;
 			}
@@ -2045,7 +2065,7 @@ public class Emulation {
 
 			if (cpu.c == 9) {
 				int offset = (cpu.d << 8) | (cpu.e);
-				int str = offset + 3;  //skip the prefix bytes
+				int str = offset;  //skip the prefix bytes
 				char read;
 
 				while ((read = (char)cpu.memory[str]) != '$') {
@@ -2060,6 +2080,7 @@ public class Emulation {
 				}
 				
 				System.out.println();
+				cpu.pc = (cpu.pc+2)&0xffff;
 			} else if (cpu.c == 2) {
 				System.out.println("print char routine called\n");
 			}
@@ -2085,15 +2106,19 @@ public class Emulation {
 				return 0xf;
 			}
 			case 1: {
-				return Main.in_port1;
+				return cpu.in_port1;
 			}
 			case 2: {
 				return 0x0;
 			}
-			default:
+			case 3: {
+				int v = ((cpu.shift1<<8) | cpu.shift0)&0xffff;
+				a = (short) ((v >> (8-cpu.shift_offset)) & 0xff);
 				return a;
+			}
 			
 		}
+		return a;
 	}
 
 }

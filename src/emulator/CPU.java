@@ -17,6 +17,14 @@ public class CPU {
 	boolean interrupt_enable;
 	ConditionCode cc;
 	
+	
+	short shift0;         //LSB of Space Invader's external shift hardware
+    short shift1;         //MSB
+    short shift_offset;         // offset for external shift hardware
+    short in_port1;
+    //output ports for sounds
+    short     out_port3, out_port5, last_out_port3, last_out_port5; 
+	
 	public CPU() {
 		a = 0;
 		b = 0;
@@ -32,7 +40,9 @@ public class CPU {
 		nextInterrupt = 0.0;
 		whichInterrupt = 0;
 		interrupt_enable = false;
+		in_port1 = 0;
 		cc = new ConditionCode();
+		
 	}
 	
 	

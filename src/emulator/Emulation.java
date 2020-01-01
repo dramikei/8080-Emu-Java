@@ -79,6 +79,7 @@ public class Emulation {
 				cpu.memory[counter] = readFile;
 				counter++;
 			}
+			file.close();
 		} catch (IOException e) {
 			System.out.println(e);
 		}
@@ -88,8 +89,8 @@ public class Emulation {
 	
 	int Emulate8080(CPU cpu) {
 		short opcode = cpu.memory[cpu.pc];
-		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode));
-		System.out.println("");
+//		System.out.println(String.format("%04x", cpu.pc)+":	0x"+String.format("%02x", opcode));
+//		System.out.println("");
 		switch(opcode) {
 			case 0x00: { break; } //NOP
 			
@@ -1585,12 +1586,13 @@ public class Emulation {
 			}
 			
 			case 0xc7: { //RST 0
-				int ret = (cpu.pc +2)&0xffff;
-				System.out.println("Pushing to Stack(call): 0x"+String.format("%04x", ret+1));
+				int ret = (cpu.pc +3)&0xffff;
+				System.out.println("Pushing to Stack(RST): 0x"+String.format("%04x", ret));
 				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
 				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 				cpu.sp = (cpu.sp-2)&0xffff;
 				cpu.pc = 0x0;
+				cpu.pc = (cpu.pc-1)&0xffff;
 				break;
 			}
 			
@@ -1875,10 +1877,13 @@ public class Emulation {
 			}
 			
 			case 0xef: { //RST 5
-				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((cpu.pc >> 8) & 0xff);
-				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (cpu.pc & 0xff);
+				int ret = (cpu.pc +3)&0xffff;
+				System.out.println("Pushing to Stack(RST): 0x"+String.format("%04x", ret));
+				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
+				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 				cpu.sp = (cpu.sp-2)&0xffff;
-				cpu.pc = 0x20;
+				cpu.pc = 0x28;
+				cpu.pc = (cpu.pc-1)&0xffff;
 				break;
 			}
 			
@@ -1952,6 +1957,17 @@ public class Emulation {
 				break;
 			}
 			
+			case 0xf7: { //RST 6
+				int ret = (cpu.pc +3)&0xffff;
+				System.out.println("Pushing to Stack(RST): 0x"+String.format("%04x", ret));
+				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
+				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
+				cpu.sp = (cpu.sp-2)&0xffff;
+				cpu.pc = 0x30;
+				cpu.pc = (cpu.pc-1)&0xffff;
+				break;
+			}
+			
 			case 0xf8: { //RM
 				if(cpu.cc.s != 0) {
 					ret(cpu);
@@ -1997,6 +2013,17 @@ public class Emulation {
 				set_cc_parity(x,cpu);
 				cpu.cc.cy = (short)((cpu.a < cpu.memory[cpu.pc+1])?1:0);
 				cpu.pc = (cpu.pc+1)&0xffff;
+				break;
+			}
+			
+			case 0xff: { //RST 7
+				int ret = (cpu.pc +3)&0xffff;
+				System.out.println("Pushing to Stack(RST): 0x"+String.format("%04x", ret));
+				cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
+				cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
+				cpu.sp = (cpu.sp-2)&0xffff;
+				cpu.pc = 0x38;
+				cpu.pc = (cpu.pc-1)&0xffff;
 				break;
 			}
 			
@@ -2049,7 +2076,6 @@ public class Emulation {
 	
 	void call(CPU cpu) {
 		int ret = (cpu.pc +3)&0xffff;
-		System.out.println("Pushing to Stack(call): 0x"+String.format("%04x", ret));
 		cpu.memory[(cpu.sp - 1) & 0xffff] = (short) ((ret >> 8) & 0xff);
 		cpu.memory[(cpu.sp - 2) & 0xffff] = (short) (ret & 0xff);
 		cpu.sp = (cpu.sp-2)&0xffff;

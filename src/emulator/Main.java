@@ -6,6 +6,7 @@ import java.time.Instant;
 import javax.swing.JFrame;
 
 public class Main {
+	static int CYCLES_PER_FRAME = 4_000_000 / 60;
 	static long lastInterrupt = 0;
 	public static void main(String[] args) {
 		CPU cpu = new CPU();
@@ -30,64 +31,36 @@ public class Main {
 //		
 		Screen screen = new Screen(cpu, displayScale);
 		Frame f = new Frame(cpu, screen);
-		
-//		now = Instant.now(clock)
-//		int cyclesPerFrame = 2000000 / 60;
-//		int halfCyclesPerFrame = cyclesPerFrame / 2;
+
 		while(true) {
-			//Emulation will be stopped when CPU encounters opcode: 0x76 (HLT)
-			
-			long now = System.currentTimeMillis();
-			if(cpu.lastTimer == 0.0) {
-				cpu.lastTimer = now;
-				cpu.nextInterrupt = cpu.lastTimer + 16;
-				cpu.whichInterrupt = 1;
+			halfStep(cpu,emulator,f,true);
+			halfStep(cpu,emulator,f,false);
+			try {
+				Thread.sleep(16);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	        
+		}
+	}
+	
+	
+	static void halfStep(CPU cpu, Emulation emulator,Frame frame, boolean topHalf) {
+		Thread obj =new Thread(frame);
+		int cyclesSpent = 0;
+		while (cyclesSpent < (CYCLES_PER_FRAME / 2)) {
+            int cycles = emulator.Emulate8080(cpu);
+            cyclesSpent += cycles;
+        }
+		System.out.println("Redrawing Screen");
+		obj.start();
+		if (cpu.interrupt_enable) {
+			if(topHalf) {
+				emulator.GenerateInterrupt(cpu,1);
+			} else {
+				emulator.GenerateInterrupt(cpu,2);
 			}
 			
-			if(now - cpu.lastTimer> 16) {
-				Thread obj =new Thread(f);
-				obj.start();
-			}
-			if ((cpu.interrupt_enable) && (now > cpu.nextInterrupt)) {
-				if (cpu.whichInterrupt == 1) {
-					emulator.GenerateInterrupt(cpu,1);
-					cpu.whichInterrupt = 2;
-	            }
-	            else {
-	            	emulator.GenerateInterrupt(cpu,2);
-	            	cpu.whichInterrupt = 1;
-	            }
-				cpu.nextInterrupt = now + 8;
-			}
-			
-			double sinceLast = (now - cpu.lastTimer);
-			int cycles_to_catch_up = (int)(2 * sinceLast);
-	        int cycles = 0;
-//	        if (cpu.interrupt_enable) {
-//	        	if (cpu.whichInterrupt == 1) {
-//					emulator.GenerateInterrupt(cpu,1);
-//					cpu.whichInterrupt = 2;
-//	            }
-//	        }
-	        
-	        while (cycles_to_catch_up > cycles) {
-	        	if(cpu.memory[cpu.pc] == 0xdb ||cpu.memory[cpu.pc] == 0xd3 ) {
-	        		emulator.Emulate8080(cpu);
-	        		cycles+=3;
-	        	}
-	        	cycles += emulator.Emulate8080(cpu);
-	        }
-	        
-	        
-//	        if (cpu.interrupt_enable) {
-//	        	if (cpu.whichInterrupt == 2) {
-//					emulator.GenerateInterrupt(cpu,2);
-//					cpu.whichInterrupt = 1;
-//	            }
-//	        }
-//        
-//	        cpu.lastTimer = now;
-	        
 		}
 	}
 }
